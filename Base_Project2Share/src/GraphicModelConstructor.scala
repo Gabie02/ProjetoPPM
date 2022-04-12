@@ -1,8 +1,12 @@
-import javafx.scene.shape.{Cylinder, Box, Shape3D}
+import javafx.scene.paint.{Color, PhongMaterial}
+import javafx.scene.shape.{Box, Cylinder, Shape3D}
+
+import java.io.FileNotFoundException
+import scala.util.{Failure, Success, Try}
 
 case class GraphicModelConstructor() {
 
-  def buildObject(obj: String): Shape3D = {GraphicModelConstructor.buildObject(obj, this)}
+  def buildObject(obj: String): Shape3D = {GraphicModelConstructor.buildObject(obj).get}
 
 }
 
@@ -10,28 +14,54 @@ object GraphicModelConstructor {
 
   type Translate = (Int, Int, Int)
   type Scale = (Double, Double, Double)
+  type Color = (Int, Int, Int)
 
-  def buildObject(line: String, gmc: GraphicModelConstructor): Shape3D = {
-    val obj = line.split(" ")
-    obj.foreach(l => println(l))
-    val translate = (obj(2), obj(3), obj(4))
-    val scale = (obj(5), obj(6), obj(7))
-    val shape = obj(0)
-    val values = obj(1).trim.split("[,(,)]")
-    //values.foreach(v => println(s"Value: $v"))
-    createShape(shape, values)
+  def buildObject(line: String): Try[Shape3D] = {
+//    try {
+      val obj = line.split(" ")
+      println(s"Length: ${obj.length}")
+      val shape = obj(0)
+      val values = obj(1).replaceAll("[()]", "").split(",")
+      obj.length match {
+        case 8 =>
+          val color = (values(0).toInt, values(1).toInt, values(2).toInt)
+          val translate = (obj(2).toInt, obj(3).toInt, obj(4).toInt)
+          val scale = (obj(5).toDouble, obj(6).toDouble, obj(7).toDouble)
+          values.foreach(v => println(s"Value: $v"))
+          Success(createShape(shape, color, translate, scale))
+
+
+        case 2 =>
+          val color = (values(0).toInt, values(1).toInt, values(2).toInt)
+          val translate = (0,0,0)
+          val scale = (1.0,1.0,1.0)
+          values.foreach(v => println(s"Value: $v"))
+          Success(createShape(shape, color, translate, scale))
+        case _ => Failure(new IllegalArgumentException("Ficheiro mal formatado"))
+      }
+//    } catch {
+//      case e: FileNotFoundException => println("FileNotFoundException occurred");
+//      case e: IllegalArgumentException => Failure("IOException occurred"); 
+//    }
   }
 
-  private def createShape(shape:String, values: Array[String]): Shape3D = {
+  private def createShape(shape:String, color:Color, translate: Translate, scale: Scale): Shape3D = {
+    def setShapes(s:Shape3D, color:Color, translate: Translate, scale: Scale):Shape3D = {
+      println(s"Box: ${s.toString}")
+      s.setTranslateX(translate._1)
+      s.setTranslateY(translate._2)
+      s.setTranslateZ(translate._3)
+      s.setScaleX(scale._1)
+      s.setScaleY(scale._2)
+      s.setScaleZ(scale._3)
+      val shapeColor= new PhongMaterial()
+      shapeColor.setDiffuseColor(Color.rgb(color._1,color._2,color._3))
+      s.setMaterial(shapeColor)
+      s
+    }
     shape match {
-      case "Box" => {
-        val a = new Box(1,1,1)
-        println(s"Box: ${a.toString}")
-        a.translateXProperty()
-
-        a
-      }
-      case "Cylinder" => val a = new Cylinder(0.5, 1, 10); println(s"Cylinder: ${a.toString}");a
+      case "Box" => setShapes(new Box(1,1,1),color, translate, scale)
+      case "Cylinder" =>  setShapes(new Cylinder(0.5,1,10),color, translate, scale)
     }
 
   }

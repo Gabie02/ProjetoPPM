@@ -1,12 +1,16 @@
 <component name="libraryTable">
   <library name="lib">
     <CLASSES>
-      <root url="jar://C:/Program Files (x86)/scala/lib/scala-library.jar!/" />
-      <root url="jar://C:/Program Files (x86)/scala/lib/scala-reflect.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../../../Program Files (x86)/scala/lib/scala-library.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../../../Program Files (x86)/scala/lib/scala-reflect.jar!/" />
       <root url="file://$PROJECT_DIR$/../../../Aulas/Aulas 2º ano/2º Semestre/Projeto Programação Multiparadigma/javafx-sdk-17.0.2/lib" />
+      <root url="file://$USER_HOME$/Desktop/PPM/JavaFX/javafx-sdk-18/lib" />
+      <root url="file://$PROJECT_DIR$/../../../../../../javafx-sdk-15.0.1/lib" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
+    <jarDirectory url="file://$USER_HOME$/Desktop/PPM/JavaFX/javafx-sdk-18/lib" recursive="false" />
     <jarDirectory url="file://$PROJECT_DIR$/../../../Aulas/Aulas 2º ano/2º Semestre/Projeto Programação Multiparadigma/javafx-sdk-17.0.2/lib" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../../../javafx-sdk-15.0.1/lib" recursive="false" />
   </library>
 </component>

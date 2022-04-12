@@ -136,12 +136,12 @@ class Main extends Application {
     stage.setScene(scene)
     stage.show
 
-/*
+
     //oct1 - example of an Octree[Placement] that contains only one Node (i.e. cylinder1)
     //In case of difficulties to implement task T2 this octree can be used as input for tasks T3, T4 and T5
 
-    val placement1: Placement = ((0, 0, 0), 8.0)
-    val sec1: Section = (((0.0,0.0,0.0), 4.0), List(cylinder1.asInstanceOf[Node]))
+    val placement1: Placement = ((0, 0, 0), 16.0)
+    val sec1: Section = (((0.0,0.0,0.0), 8.0), List(cylinder1.asInstanceOf[Node]))
     val ocLeaf1 = OcLeaf(sec1)
     val oct1:Octree[Placement] = OcNode[Placement](placement1, ocLeaf1, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
 
@@ -165,7 +165,7 @@ class Main extends Application {
     //adding boxes b2 and b3 to the world
     worldRoot.getChildren.add(b2)
     worldRoot.getChildren.add(b3)
-*/
+
   }
 
   override def init(): Unit = {

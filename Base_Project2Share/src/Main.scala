@@ -131,6 +131,12 @@ class Main extends Application {
       worldRoot.getChildren.removeAll()
     })
 
+    //Tentar fazer com que o scroll amplie a imagem
+    //scene.setOnScroll(() =>{})
+
+    //Tentar mexer a camara com as arrow keys
+    //scene.setOnKeyPressed()
+
     //setup and start the Stage
     stage.setTitle("PPM Project 21/22")
     stage.setScene(scene)
@@ -181,7 +187,14 @@ class Main extends Application {
 object FxApp {
 
   def main(args: Array[String]): Unit = {
+    //------- Area de Testes -------
+    IO_Utils.readFromFile(s"${args(0)}")
+
+
+
+    //------------------------------
     Application.launch(classOf[Main], args: _*)
+
   }
 }
 

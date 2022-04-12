@@ -1,3 +1,5 @@
+import scala.collection.StepperShape.Shape
+
 sealed trait Octree[+A]
 
 case class OcNode[A](coords: A,
@@ -7,9 +9,19 @@ case class OcNode[A](coords: A,
                      down_10: Octree[A], down_11: Octree[A]
                     ) extends Octree[A]
 
+
 case class OcLeaf[A, B](section: B) extends Octree[A]
 
 case object OcEmpty extends Octree[Nothing]
 
-
-
+//case class OcTreeShapes[Placement] extends Octree[Placement] {
+//    def createTree():OcTreeShapes[Placement] = {
+//
+//    }
+//}
+//
+//object OcTreeShapes{
+//  def createTree():OcTreeShapes[Placement] = {
+//
+//  }
+//}

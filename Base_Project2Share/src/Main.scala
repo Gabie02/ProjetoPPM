@@ -11,18 +11,22 @@ import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import javafx.scene.{PerspectiveCamera, Scene, SceneAntialiasing, SubScene}
 import javafx.scene.input.{KeyCode, ScrollEvent}
+import OcNode.Point
+import OcNode.Size
+import OcNode.Placement
+import OcNode.Section
 
 
 class Main extends Application {
 
-  //Auxiliary types
-  type Point = (Double, Double, Double)
-  type Size = Double
-  type Placement = (Point, Size) //1st point: origin, 2nd point: size
-
-  //Shape3D is an abstract class that extends javafx.scene.Node
-  //Box and Cylinder are subclasses of Shape3D
-  type Section = (Placement, List[Node])  //example: ( ((0.0,0.0,0.0), 2.0), List(new Cylinder(0.5, 1, 10)))
+//  //Auxiliary types
+//  type Point = (Double, Double, Double)
+//  type Size = Double
+//  type Placement = (Point, Size) //1st point: origin, 2nd point: size
+//
+//  //Shape3D is an abstract class that extends javafx.scene.Node
+//  //Box and Cylinder are subclasses of Shape3D
+//  type Section = (Placement, List[Node])  //example: ( ((0.0,0.0,0.0), 2.0), List(new Cylinder(0.5, 1, 10)))
 
 
   /*
@@ -83,6 +87,7 @@ class Main extends Application {
     box1.setTranslateZ(5)
     box1.setMaterial(greenMaterial)
     box1.getBoundsInParent
+
     val listaShapes = IO_Utils.readFromFile("conf.txt")
     println(" -------------------------- ")
     //listaShapes.foreach(e => println(e))
@@ -165,16 +170,11 @@ class Main extends Application {
     stage.setScene(scene)
     stage.show
 
-
+/**/
     //oct1 - example of an Octree[Placement] that contains only one Node (i.e. cylinder1)
     //In case of difficulties to implement task T2 this octree can be used as input for tasks T3, T4 and T5
 
-    val placement1: Placement = ((0, 0, 0), 8.0)
-    val sec1: Section = (((0.0,0.0,0.0), 4.0), List(cylinder1.asInstanceOf[Node]))
-    val ocLeaf1 = OcLeaf(sec1)
-    val oct1:Octree[Placement] = OcNode[Placement](placement1, ocLeaf1, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
 
-    //example of bounding boxes (corresponding to the octree oct1) added manually to the world
     val b2 = new Box(8,8,8)
     //translate because it is added by default to the coords (0,0,0)
     b2.setTranslateX(8/2)
@@ -199,11 +199,30 @@ class Main extends Application {
     worldRoot.getChildren.add(b2)
     worldRoot.getChildren.add(b3)
 
+    val placement1: Placement = ((0, 0, 0), 8.0)
+    val sec1: Section = (((0.0,0.0,0.0), 4.0), List(cylinder1.asInstanceOf[Node], b2,b3))
+    val ocLeaf1 = OcLeaf(sec1)
+    //Root = placement1?
+    val oct1:Octree[Placement] = OcNode[Placement](placement1, ocLeaf1, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
+    //example of bounding boxes (corresponding to the octree oct1) added manually to the world
+    b3.getBoundsInParent
+//    //verificar se um modelo contém outro
+//    b.getBoundsInParent.contains(h.asInstanceOf[Shape3D].getBoundsInParent)
+//    //verificar se um modelo interseta outro
+//    h.asInstanceOf[Shape3D].getBoundsInParent.intersects(b.getBoundsInParent)
+
+
+//        worldRoot.getChildren forEach(c => {
+//              if(camVolume.asInstanceOf[Shape3D].getBoundsInParent.intersects(c.getBoundsInParent))
+//                b3.setMaterial(greenMaterial)
+//            })
+//
+
+ /**/
     //Permite mover a camera com as arrow keys
     scene.setOnKeyPressed(event => { event.getCode() match {
       case KeyCode.UP =>
         camVolume.setTranslateY(camVolume.getTranslateY - 2)
-
       //        worldRoot.getChildren.removeAll()
       case KeyCode.DOWN =>
         camVolume.setTranslateY(camVolume.getTranslateY + 2)

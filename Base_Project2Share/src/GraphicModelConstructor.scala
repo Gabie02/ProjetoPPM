@@ -17,7 +17,7 @@ object GraphicModelConstructor {
   type Color = (Int, Int, Int)
 
   def buildObject(line: String): Try[Shape3D] = {
-//    try {
+    try {
       val obj = line.split(" ")
       println(s"Length: ${obj.length}")
       val shape = obj(0)
@@ -39,10 +39,10 @@ object GraphicModelConstructor {
           Success(createShape(shape, color, translate, scale))
         case _ => Failure(new IllegalArgumentException("Ficheiro mal formatado"))
       }
-//    } catch {
-//      case e: FileNotFoundException => println("FileNotFoundException occurred");
-//      case e: IllegalArgumentException => Failure("IOException occurred"); 
-//    }
+    } catch {
+      case e: FileNotFoundException => println("FileNotFoundException occurred");
+      case e: IllegalArgumentException => Failure("IOException occurred");
+    }
   }
 
   private def createShape(shape:String, color:Color, translate: Translate, scale: Scale): Shape3D = {

@@ -1,3 +1,5 @@
+import Octree1.Octree1.partitionId
+import Octree1.root
 import com.sun.javafx.scene.shape.ShapeHelper.ShapeAccessor
 import javafx.application.Application
 import javafx.geometry.Insets
@@ -158,8 +160,6 @@ class Main extends Application {
       cameraView.setScaleY(cameraView.getScaleY * zoomfactor)
     })
 
-
-
     //setup and start the Stage
     stage.setTitle("PPM Project 21/22")
     stage.setScene(scene)
@@ -173,6 +173,11 @@ class Main extends Application {
     val sec1: Section = (((0.0,0.0,0.0), 4.0), List(cylinder1.asInstanceOf[Node]))
     val ocLeaf1 = OcLeaf(sec1)
     val oct1:Octree[Placement] = OcNode[Placement](placement1, ocLeaf1, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
+
+    val list = oct1.toString.toList
+    val list1 = oct1.toString.split(",").toList
+    println("Oct1: " + list1)
+    println(list1(0)+ " " + list1(1))
 
     //example of bounding boxes (corresponding to the octree oct1) added manually to the world
     val b2 = new Box(8,8,8)
@@ -234,8 +239,7 @@ object FxApp {
   def main(args: Array[String]): Unit = {
     //------- Area de Testes -------
     //IO_Utils.readFromFile(s"$args")
-
-
+    println("Partition: " + partitionId(root).toString())
 
     //------------------------------
     Application.launch(classOf[Main], args: _*)

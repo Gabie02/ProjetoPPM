@@ -257,35 +257,58 @@ class Main extends Application {
 
 //  }
 
-  def intersectsCamera(oct:Octree[Placement],worldroot: Group, camVolume: Cylinder):Unit = {
+  def intersectsCamera(oct:Octree[Placement], camVolume: Cylinder):Unit = {
     //val ocLeaf = oct.asInstanceOf[OcLeaf]
     //val ocNode = oct.asInstanceOf[OcNode]
-    val placement = oct.->()
-    val section = oct.asInstanceOf[Section]
-    //val placement = ocNode.coords.asInstanceOf[Placement]
-    //val list = worldroot.getChildren
-    //val list = List()
-    //val listItr = worldroot.getChildren.listIterator()
-    //for(shapes <- worldroot.getChildren.listIterator())
+    // Se for um ocNode
+    if(oct.isInstanceOf[OcNode[Placement]]) {
+      val ocnode = oct.asInstanceOf[OcNode[Placement]]
+      intersectsCamera(ocnode.up_00, camVolume)
+      intersectsCamera(ocnode.up_01, camVolume)
+      intersectsCamera(ocnode.up_10, camVolume)
+      intersectsCamera(ocnode.up_11, camVolume)
+      intersectsCamera(ocnode.down_00, camVolume)
+      intersectsCamera(ocnode.down_01, camVolume)
+      intersectsCamera(ocnode.down_10, camVolume)
+      intersectsCamera(ocnode.down_11, camVolume)
+    }
+    //val placement = oct.->()
+    // Se for uma ocLeaf
+    if (oct.isInstanceOf[OcLeaf[Placement, Section]]) {
+      val ocleaf = oct.asInstanceOf[OcLeaf[Placement, Section]]
 
-    //val node = list.get(0)
-    //val shape = node.asInstanceOf[Shape3D]
-    //val listaSection = section._2
+      //val placement = ocNode.coords.asInstanceOf[Placement]
+      //val list = worldroot.getChildren
+      //val list = List()
+      //val listItr = worldroot.getChildren.listIterator()
+      //for(shapes <- worldroot.getChildren.listIterator())
+
+      //val node = list.get(0)
+      //val shape = node.asInstanceOf[Shape3D]
+      val listaSection = ocleaf.section._2
       // Se a lista de nodes da section nao estiver vazia
-      //if(!listaSection.isEmpty) {
-        for(node <- list) {
+      if (!listaSection.isEmpty) {
+        for (node <- listaSection) {
           node.asInstanceOf[Shape3D]
-          if(node.isInstanceOf[Box]){
+          if (node.isInstanceOf[Box]) {
             val box = node.asInstanceOf[Box]
-              if(box.getDrawMode.equals(DrawMode.LINE) && camVolume.asInstanceOf[Shape3D].getBoundsInParent.intersects(box.getBoundsInParent)) {
+            if (box.getDrawMode.equals(DrawMode.LINE)) {
+              // Se intersetar
+              if(camVolume.asInstanceOf[Shape3D].getBoundsInParent.intersects(box.getBoundsInParent)) {
                 val greenMaterial = new PhongMaterial()
-                greenMaterial.setDiffuseColor(Color.rgb(0,255,0))
+                greenMaterial.setDiffuseColor(Color.rgb(0, 255, 0))
                 box.setMaterial(greenMaterial)
+              } else {
+                val redMaterial = new PhongMaterial()
+                redMaterial.setDiffuseColor(Color.rgb(150,0,0))
+                box.setMaterial(redMaterial)
               }
+            }
           }
         }
       }
-  //}
+    }
+  }
 
 
 

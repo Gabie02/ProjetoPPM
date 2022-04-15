@@ -258,8 +258,6 @@ class Main extends Application {
 //  }
 
   def intersectsCamera(oct:Octree[Placement], camVolume: Cylinder):Unit = {
-    //val ocLeaf = oct.asInstanceOf[OcLeaf]
-    //val ocNode = oct.asInstanceOf[OcNode]
     // Se for um ocNode
     if(oct.isInstanceOf[OcNode[Placement]]) {
       val ocnode = oct.asInstanceOf[OcNode[Placement]]
@@ -272,20 +270,12 @@ class Main extends Application {
       intersectsCamera(ocnode.down_10, camVolume)
       intersectsCamera(ocnode.down_11, camVolume)
     }
-    //val placement = oct.->()
+
     // Se for uma ocLeaf
     if (oct.isInstanceOf[OcLeaf[Placement, Section]]) {
       val ocleaf = oct.asInstanceOf[OcLeaf[Placement, Section]]
-
-      //val placement = ocNode.coords.asInstanceOf[Placement]
-      //val list = worldroot.getChildren
-      //val list = List()
-      //val listItr = worldroot.getChildren.listIterator()
-      //for(shapes <- worldroot.getChildren.listIterator())
-
-      //val node = list.get(0)
-      //val shape = node.asInstanceOf[Shape3D]
       val listaSection = ocleaf.section._2
+
       // Se a lista de nodes da section nao estiver vazia
       if (!listaSection.isEmpty) {
         for (node <- listaSection) {
@@ -309,10 +299,6 @@ class Main extends Application {
       }
     }
   }
-
-
-
-
 
 
 

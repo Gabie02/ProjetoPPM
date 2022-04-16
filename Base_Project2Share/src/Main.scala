@@ -244,6 +244,7 @@ class Main extends Application {
         camVolume.setTranslateX(camVolume.getTranslateX + 2)
         intersectsCamera(oct1,camVolume)
       //        worldRoot.getChildren.removeAll()
+      case _ =>
     }
     })
 

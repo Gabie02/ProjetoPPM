@@ -262,7 +262,7 @@ class Main extends Application {
   def intersectsCamera(oct:Octree[Placement], camVolume: Cylinder):Unit = {
     oct match {
       // Se for um ocNode
-      case _: OcNode[Placement] => {
+      case _: OcNode[Placement] =>
         val ocnode = oct.asInstanceOf[OcNode[Placement]]
         intersectsCamera(ocnode.up_00, camVolume)
         intersectsCamera(ocnode.up_01, camVolume)
@@ -272,10 +272,10 @@ class Main extends Application {
         intersectsCamera(ocnode.down_01, camVolume)
         intersectsCamera(ocnode.down_10, camVolume)
         intersectsCamera(ocnode.down_11, camVolume)
-      }
+
 
         // Se for uma ocLeaf
-      case _: OcLeaf[Placement, Section] => {
+      case _: OcLeaf[Placement, Section] =>
           val ocleaf = oct.asInstanceOf[OcLeaf[Placement, Section]]
           val listaSection = ocleaf.section._2
 
@@ -301,7 +301,7 @@ class Main extends Application {
               t
             })
           }
-        }
+
       case _ =>
     }
   }

@@ -94,12 +94,14 @@ class Main extends Application {
     println(listaShapes)
 
     // 3D objects (group of nodes - javafx.scene.Node) that will be provide to the subScene
-    val worldRoot:Group = new Group(wiredBox, camVolume, lineX, lineY, lineZ, cylinder1, box1)
-
-    //Adicionar shapes à scene
+    val worldRoot:Group = new Group(wiredBox, camVolume, lineX, lineY, lineZ)
+    val shapeRoot:Group = new Group(cylinder1, box1)
+    //Adicionar shapes à a uma lista própria de shapes
     (listaShapes foldRight ()) ((h, t) => {
-      worldRoot.getChildren.add(h); t
+      shapeRoot.getChildren.add(h); t
     })
+    //Após os elementos serem adicionados, tem que se inserir os mesmos numa octree
+
 
     // Camera
     val camera = new PerspectiveCamera(true)
@@ -163,8 +165,6 @@ class Main extends Application {
       cameraView.setScaleY(cameraView.getScaleY * zoomfactor)
     })
 
-
-
     //setup and start the Stage
     stage.setTitle("PPM Project 21/22")
     stage.setScene(scene)
@@ -195,12 +195,16 @@ class Main extends Application {
       b3.setMaterial(greenMaterial)
     b3.setDrawMode(DrawMode.LINE)
 
+
     //adding boxes b2 and b3 to the world
-    worldRoot.getChildren.add(b2)
-    worldRoot.getChildren.add(b3)
+//    worldRoot.getChildren.add(b2)
+//    worldRoot.getChildren.add(b3)
+    shapeRoot.getChildren.add(b2)
+    shapeRoot.getChildren.add(b3)
+
 
     val placement1: Placement = ((0, 0, 0), 8.0)
-    val sec1: Section = (((0.0,0.0,0.0), 4.0), List(cylinder1.asInstanceOf[Node], b2,b3))
+    val sec1: Section = (((0.0,0.0,0.0), 4.0), List(cylinder1.asInstanceOf[Node],b2,b3))
     val ocLeaf1 = OcLeaf(sec1)
     //Root = placement1?
     val oct1:Octree[Placement] = OcNode[Placement](placement1, ocLeaf1, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
@@ -220,7 +224,8 @@ class Main extends Application {
 
  /**/
     //Permite mover a camera com as arrow keys
-    scene.setOnKeyPressed(event => { event.getCode() match {
+    scene.setOnKeyPressed(event => {
+      event.getCode() match {
       case KeyCode.UP =>
         camVolume.setTranslateY(camVolume.getTranslateY - 2)
       //        worldRoot.getChildren.removeAll()
@@ -234,8 +239,50 @@ class Main extends Application {
         camVolume.setTranslateX(camVolume.getTranslateX + 2)
       //        worldRoot.getChildren.removeAll()
     }
+      shapeRoot.getChildren.forEach(c => {
+        if(camVolume.asInstanceOf[Shape3D].getBoundsInParent.contains(c.getBoundsInParent))
+          c.asInstanceOf[Shape3D].setMaterial(greenMaterial)
+        else
+          c.asInstanceOf[Shape3D].setMaterial(redMaterial)
+      })
     })
+    worldRoot.getChildren.addAll(shapeRoot)
+    worldRoot.getChildren
 
+    //------- Testes -------
+    val tree = oct1.asInstanceOf[OcNode[Placement]]
+    val elementName = tree.productElementName(2)
+    val node = tree.copy(up_01 = ocLeaf1)
+    //    tree.productElement(4) = node
+    println(s"Teste função nome ---> : ${tree.productElementName(2)} " +
+    s"\n Arity: ${oct1.asInstanceOf[OcNode[Placement]].productArity} " +
+    s"\n Cor: ${oct1.asInstanceOf[OcNode[Placement]].down_00.isInstanceOf[OcNode[Placement]]}" +
+    s"\n Node: $node" +
+      s"\n List: ${shapeRoot.getChildren}" +
+      s"\n AttributeList: ${OcNode.createAttributesList(node)}")
+
+
+
+    val t1 = GraphicModelConstructor.buildObject("Box (0,0,255) 10 10 10 10 10 10").get
+    val t2 = GraphicModelConstructor.buildObject("Box (0,0,255) 2 2 2 2 2 2").get
+    shapeRoot.getChildren.add(t1)
+    worldRoot.getChildren.add(t1)
+    println(s"----- TESTE: ----> T1\n Contains: ${
+      camVolume.getBoundsInParent.contains(t1.getBoundsInParent)
+    } \n Intersects: ${
+      camVolume.asInstanceOf[Shape3D].getBoundsInParent.intersects(t1.getBoundsInParent)
+    }")
+    shapeRoot.getChildren.add(t2)
+    worldRoot.getChildren.add(t2)
+    println(s"----- TESTE: ----> T2\n Contains: ${
+      camVolume.getBoundsInParent.contains(t2.getBoundsInParent)
+    } \n Intersects: ${
+      camVolume.asInstanceOf[Shape3D].getBoundsInParent.intersects(t2.getBoundsInParent)
+    }")
+    //----------------------
+    OcNode.mapColourEffect(c => OcNode.sepiaEffect(c))(oct1)
+//    OcNode.mapColourEffect(c => OcNode.greenRemove(c))(oct1)
+    OcNode.scaleOctree(0.5,oct1)
   }
 
   override def init(): Unit = {

@@ -1,5 +1,7 @@
+import OcNode.Placement
 import javafx.scene.{Group, Node}
-import javafx.scene.shape.{Box, Cylinder, Shape3D}
+import javafx.scene.shape.{Box, Cylinder, DrawMode, Shape3D}
+import javafx.scene.paint.{Color, PhongMaterial}
 
 sealed trait Octree[+A]
 
@@ -9,9 +11,14 @@ case class OcNode[A](coords: A,
                      down_00: Octree[A], down_01: Octree[A],
                      down_10: Octree[A], down_11: Octree[A]
                     ) extends Octree[A] {
+  def scaleOctree(fact:Double, oct:Octree[Placement]):Octree[Placement] = {
+    OcNode.scaleOctree(fact, oct)
+  }
 
-  def createTree[A](worldRoot: Group) =
-    OcNode.createTree(worldRoot, this[A])
+  def createAttributesList(e:OcNode[Placement]):List[Octree[Placement]] = OcNode.createAttributesList(e)
+
+  def createTree(worldRoot: Group, shapeRoot: Group,root: Placement):Octree[Placement] =
+    OcNode.createTree(worldRoot, shapeRoot,root)
 
 }
 
@@ -31,139 +38,177 @@ object OcNode {
     (p1._1 + p2._1, p1._2 + p2._2, p1._3 + p2._3)
   }
 
+
   //Shape3D is an abstract class that extends javafx.scene.Node
   //Box and Cylinder are subclasses of Shape3D
   type Section = (Placement, List[Node])  //example: ( ((0.0,0.0,0.0), 2.0), List(new Cylinder(0.5, 1, 10)))
 
+  def scaleOctree(fact:Double, oct:Octree[Placement]):Octree[Placement] = {
+    val root = oct.asInstanceOf[OcNode[Placement]]
+    val inputSize = root.productArity
+    for(a <- 0 to inputSize - 1) {
+      val partition = root.productElement(a)
+      if(partition.isInstanceOf[OcNode[Placement]]) {
+        scaleOctree(fact, oct)
+      } else if(partition.isInstanceOf[OcLeaf[Placement,Section]]) {
+        val shapelist = partition.asInstanceOf[OcLeaf[Placement, Section]].section._2
+        (shapelist foldRight List[Node]()) ((h,t) => {
+          h.setScaleX(h.getScaleX * fact)
+          h.setScaleY(h.getScaleY * fact)
+          h.setScaleZ(h.getScaleZ * fact)
+          h::t
+        })
+      }
+    }
+    root
+  }
+  def createAttributesList(e:OcNode[Placement]):List[Octree[Placement]] = {
+    def iterate(e:OcNode[Placement], l:List[Octree[Placement]], s:Int):List[Octree[Placement]] = {
+      s match {
+        case x => if (x == e.productArity) l else {
+          iterate(e, l :+ e.productElement(s).asInstanceOf[Octree[Placement]], s + 1)}
+      }
+    }
+    iterate(e,List[Octree[Placement]](), 1)
 
-  def createTree(worldRoot: Group, root: Placement):Octree[Placement] = {
-    //Criar os nodes children
-    val point = root._1
+  }
+
+//
+//  def map[B](func: B => B)(oct:Octree[Placement]): Octree[Placement] = {
+////    def iterateThroughNode(): Unit = {
+////
+////    }
+//    val root = oct.asInstanceOf[OcNode[Placement]]
+//    val inputSize = root.productArity
+//    for( a <- 1 to inputSize) {
+//      val partition = root.productElement(a)
+//      if(partition.isInstanceOf[OcNode[Placement]]){
+//        map(func)(partition.asInstanceOf[Octree[Placement]])
+//      } else if(partition.isInstanceOf[OcLeaf[Placement,Section]]){
+//       ( partition.asInstanceOf[OcLeaf[Placement,Section]].section._2 foldRight List[Node]()) ((h,t) => func(h))
+//      }
+//    }
+//
+//  }
+
+  def mapping[A](lst:List[A], f:A => A):List[A] = {
+    lst match {
+      case Nil => Nil
+      case x :: xs => f(x) :: mapping(xs,f)
+    }
+  }
+
+  def sepiaEffect(c:Color):Color = {
+    val r = c.getRed * 255
+    val g = c.getGreen * 255
+    val b = c.getBlue * 255
+    println(s"Cor: $c RGB: $r, $g, $b")
+    val newR = if(0.4*r + 0.77*g + 0.2*b > 255.0 ) 255  else  (0.4*r + 0.77*g + 0.2*b)
+    val newG = if(0.35*r + 0.69*g + 0.17*b > 255.0) 255 else (0.35*r + 0.69*g + 0.17*b)
+    val newB = if(0.27*r + 0.53*g + 0.13*b > 255.0) 255 else (0.27*r + 0.53*g + 0.13*b)
+    println(s"New RGB: $newR, $newG, $newB")
+    Color.rgb(newR.toInt, newG.toInt, newB.toInt)
+  }
+
+  def greenRemove(c:Color):Color = {
+    Color.rgb((c.getRed * 255 ).toInt, 0, (c.getBlue * 255).toInt)
+  }
+
+  def mapColourEffect(func: Color => Color)(oct:Octree[Placement]): Octree[Placement] = {
+    val root = oct.asInstanceOf[OcNode[Placement]]
+    val inputSize = root.productArity
+    for( a <- 0 to inputSize - 1) {
+      val partition = root.productElement(a)
+      if(partition.isInstanceOf[OcNode[Placement]]){
+        mapColourEffect(func)(partition.asInstanceOf[Octree[Placement]])
+      } else if(partition.isInstanceOf[OcLeaf[Placement,Section]]) {
+        val shapelist:List[Node] = partition.asInstanceOf[OcLeaf[Placement,Section]].section._2
+        (shapelist foldRight List[Node]())((h,t) => {
+          val material = h.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial]
+          val color:Color = material.getDiffuseColor
+          material.setDiffuseColor(func(color));t
+        })
+        }
+    }
+    root
+  }
+
+  def smallestPartition() = {
+
+  }
+
+  def createTree(worldRoot: Group, shapeRoot: Group, root: Placement):Octree[Placement] = {
+    val point = root._1 // A root n vai ser sempre o quadrado vermelho grande?
     val size = root._2
+    val emptyOcNode = new OcNode[Placement](((0.0,0.0,0.0), size/2), OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
+    var finalTree = emptyOcNode
     val corners = List[Point]()
-
     val up_00 = addTwoPoints(point, (0.0,0.0,0.0))
     corners:+up_00
-    val b1 = new Box(up_00._1, up_00._2, up_00._3)
-    worldRoot.getChildren.forEach(c =>{
-      if(b1.getBoundsInParent.contains(c.asInstanceOf[Shape3D].getBoundsInParent))
-      new OcNode[Placement]((up_00,size/2),
-          createTree(worldRoot,(up_00,size/2)), OcEmpty,
-          OcEmpty, OcEmpty,
-          OcEmpty, OcEmpty,
-          OcEmpty, OcEmpty)
-    })
-
     val up_01 = addTwoPoints(point, (0.0,size / 2,0.0))
     corners:+up_01
-    val b2 = new Box(up_01._1, up_01._2, up_01._3)
-    worldRoot.getChildren.forEach(c =>{
-      if(b2.getBoundsInParent.contains(c.asInstanceOf[Shape3D].getBoundsInParent))
-        new OcNode[Placement]((up_01,size/2),
-              OcEmpty, createTree(worldRoot,(up_01,size/2)),
-              OcEmpty, OcEmpty,
-              OcEmpty, OcEmpty,
-              OcEmpty, OcEmpty)
-      else if(c.asInstanceOf[Shape3D].getBoundsInParent.intersects(b2.getBoundsInParent))
-        new OcNode[Placement]((up_01,size/2),
-          OcEmpty, ,
-          OcEmpty, OcEmpty,
-          OcEmpty, OcEmpty,
-          OcEmpty, OcEmpty))
-    })
-
     val up_10 = addTwoPoints(point, (size / 2,0.0,0.0))
     corners:+up_10
-    val b3 = new Box(up_10._1, up_10._2, up_10._3)
-    worldRoot.getChildren.forEach(c =>{
-      if(b3.getBoundsInParent.contains(c.asInstanceOf[Shape3D].getBoundsInParent))
-      new OcNode[Placement]((up_10,size/2),
-            OcEmpty, OcEmpty,
-            createTree(worldRoot,(up_10,size/2)), OcEmpty,
-            OcEmpty, OcEmpty,
-            OcEmpty, OcEmpty)
-    })
-
     val up_11 = addTwoPoints(point, (size / 2,size / 2,0.0))
     corners:+up_11
-    val b4 = new Box(up_11._1, up_11._2, up_11._3)
-    worldRoot.getChildren.forEach(c => {
-      if(b4.getBoundsInParent.contains(c.asInstanceOf[Shape3D].getBoundsInParent))
-      new OcNode[Placement]((up_11,size/2),
-            OcEmpty, OcEmpty,
-            OcEmpty, createTree(worldRoot,(up_11,size/2)),
-            OcEmpty, OcEmpty,
-            OcEmpty, OcEmpty)
-    })
-
     val down_00 = addTwoPoints(point, (0.0,0.0,size / 2))
     corners:+down_00
-    val b5 = new Box(down_00._1, down_00._2, down_00._3)
-    worldRoot.getChildren.forEach(c =>{
-      if(b5.getBoundsInParent.contains(c.asInstanceOf[Shape3D].getBoundsInParent))
-        new OcNode[Placement]((down_00,size/2),
-          OcEmpty, OcEmpty,
-          OcEmpty, OcEmpty,
-          createTree(worldRoot,(down_00,size/2)), OcEmpty,
-          OcEmpty, OcEmpty)
-    })
-
-
     val down_01 = addTwoPoints(point, (0.0,size / 2,size / 2))
     corners:+down_01
-    val b6 = new Box(down_01._1, down_01._2, down_01._3)
-    worldRoot.getChildren.forEach(c =>{
-      if(b6.getBoundsInParent.contains(c.asInstanceOf[Shape3D].getBoundsInParent))
-        new OcNode[Placement]((down_01,size/2),
-          OcEmpty, OcEmpty,
-          OcEmpty, createTree(worldRoot,(down_01,size/2)),
-          OcEmpty, OcEmpty,
-          OcEmpty, OcEmpty)
-    })
-
-
     val down_10 = addTwoPoints(point, (size / 2,0.0,size / 2))
     corners:+down_10
-    val b7 = new Box(down_10._1, down_10._2, down_10._3)
-    worldRoot.getChildren.forEach(c =>{
-      if(b7.getBoundsInParent.contains(c.asInstanceOf[Shape3D].getBoundsInParent))
-        new OcNode[Placement]((down_10,size/2),
-          OcEmpty, OcEmpty,
-          OcEmpty, OcEmpty,
-          OcEmpty, OcEmpty,
-          createTree(worldRoot,(down_10,size/2)), OcEmpty)
-    })
-
     val down_11 = addTwoPoints(point, (size / 2,size / 2,size / 2))
     corners:+down_11
-    val b8 = new Box(down_11._1, down_11._2, down_11._3)
-    worldRoot.getChildren.forEach(c =>{
-      if(b8.getBoundsInParent.contains(c.asInstanceOf[Shape3D].getBoundsInParent))
-        new OcNode[Placement]((down_11,size/2),
-          OcEmpty, OcEmpty,
-          OcEmpty, OcEmpty,
-          OcEmpty, OcEmpty,
-          OcEmpty, createTree(worldRoot,(down_11,size/2)))
+    shapeRoot.getChildren.forEach(c =>{
+       for(a <- 0 to 7) {
+         val partition = createWiredBox(corners(a), size/2)
+         val parent = createWiredBox(point,size)
+         //Criar mais niveis na arvore
+         if(partition.getBoundsInParent.contains(c.asInstanceOf[Shape3D].getBoundsInParent)) {
+           //tentar fazer a verificação se há interseção do mesmo objeto com várias partições, se assim for, deve-se mover para a partição "maior"
+           //Fazer break do for loop e fazer a translação para esse canto?
+           a match {
+             case 0 => finalTree = finalTree.copy(up_00 = createTree(worldRoot, shapeRoot,(corners(a), size/2)))
+             case 1 => finalTree = finalTree.copy(up_01 = createTree(worldRoot, shapeRoot,(corners(a), size/2)))
+             case 2 => finalTree = finalTree.copy(up_10 = createTree(worldRoot, shapeRoot,(corners(a), size/2)))
+             case 3 => finalTree = finalTree.copy(up_11 = createTree(worldRoot, shapeRoot,(corners(a), size/2)))
+             case 4 => finalTree = finalTree.copy(down_00 = createTree(worldRoot, shapeRoot,(corners(a), size/2)))
+             case 5 => finalTree = finalTree.copy(down_01 = createTree(worldRoot, shapeRoot,(corners(a), size/2)))
+             case 6 => finalTree = finalTree.copy(down_10 = createTree(worldRoot, shapeRoot,(corners(a), size/2)))
+             case 7 => finalTree = finalTree.copy(down_11 = createTree(worldRoot, shapeRoot,(corners(a), size/2)))
+           }
+           //Caso a arvore não possa ser mais subdividida
+         }else if(parent.getBoundsInParent.contains(c.asInstanceOf[Shape3D].getBoundsInParent)) {
+           a match {
+//             case 0 => finalTree = finalTree.copy(up_00 = new OcLeaf[Placement,Section]((point, size),(corners(a), size/2), List()))
+             case 1 => finalTree = finalTree.copy(up_01 = createTree(worldRoot, shapeRoot,(corners(a), size/2)))
+             case 2 => finalTree = finalTree.copy(up_10 = createTree(worldRoot, shapeRoot,(corners(a), size/2)))
+             case 3 => finalTree = finalTree.copy(up_11 = createTree(worldRoot, shapeRoot,(corners(a), size/2)))
+             case 4 => finalTree = finalTree.copy(down_00 = createTree(worldRoot, shapeRoot,(corners(a), size/2)))
+             case 5 => finalTree = finalTree.copy(down_01 = createTree(worldRoot, shapeRoot,(corners(a), size/2)))
+             case 6 => finalTree = finalTree.copy(down_10 = createTree(worldRoot, shapeRoot,(corners(a), size/2)))
+             case 7 => finalTree = finalTree.copy(down_11 = createTree(worldRoot, shapeRoot,(corners(a), size/2)))
+           }
+         }
+       }
     })
-    corners:+down_11
+    finalTree
+  }
 
-//    corners.foreach(co => {
-//      val b = new Box(co._1, co._2, co._3)
-//      worldRoot.getChildren.forEach(ch => {
-//       if(b.getBoundsInParent.contains(ch.asInstanceOf[Shape3D].getBoundsInParent))
-//         createTree(worldRoot, (co,size/2))
-//        new OcNode[Placement]()
-//      })
-//    })
+//  def canBeDivided(node:Placement, ) = {
+//
+//  }
 
-    //    val wiredBox1 = new Box(root._1._1 + root._2 root._1._2+ root._2, root._1._3+ root._2)
-//    val wiredBox2 = new Box(root._1._1 + root._2, root._1._2 + root._2, root._1._3 + root._2)
-//    val wiredBox3 = new Box(root._1._1 + root._2, root._1._2 + root._2, root._1._3 + root._2)
-//    val wiredBox4 = new Box(root._1._1 + root._2, root._1._2 + root._2, root._1._3 + root._2)
-
-//    worldRoot.getChildren.forEach(c =>
-//      if(wiredBox1.getBoundsInParent.contains(c.asInstanceOf[Shape3D].getBoundsInParent))
-
+  def createWiredBox(origin: Point, size:Size):Shape3D = {
+    val box = new Box(size,size,size)
+    box.setTranslateX(origin._1)
+    box.setTranslateY(origin._2)
+    box.setTranslateZ(origin._3)
+    val redMaterial = new PhongMaterial()
+    redMaterial.setDiffuseColor(Color.rgb(150,0,0))
+    box.setMaterial(redMaterial)
+    box.setDrawMode(DrawMode.LINE)
+    box
   }
 
 

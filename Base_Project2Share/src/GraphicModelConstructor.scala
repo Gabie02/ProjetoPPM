@@ -10,7 +10,7 @@ case class GraphicModelConstructor() {
 
 }
 
-object GraphicModelConstructor {
+object GraphicModelConstructor{
 
   type Translate = (Int, Int, Int)
   type Scale = (Double, Double, Double)
@@ -19,33 +19,26 @@ object GraphicModelConstructor {
   def buildObject(line: String): Try[Shape3D] = {
     try {
       val obj = line.split(" ")
-      println(s"Length: ${obj.length}")
       val shape = obj(0)
       val values = obj(1).replaceAll("[()]", "").split(",")
+      val color = (values(0).toInt, values(1).toInt, values(2).toInt)
       obj.length match {
         case 8 =>
-          val color = (values(0).toInt, values(1).toInt, values(2).toInt)
           val translate = (obj(2).toInt, obj(3).toInt, obj(4).toInt)
           val scale = (obj(5).toDouble, obj(6).toDouble, obj(7).toDouble)
-          values.foreach(v => println(s"Value: $v"))
           Success(createShape(shape, color, translate, scale))
-
-
         case 2 =>
-          val color = (values(0).toInt, values(1).toInt, values(2).toInt)
           val translate = (0,0,0)
           val scale = (1.0,1.0,1.0)
-          values.foreach(v => println(s"Value: $v"))
           Success(createShape(shape, color, translate, scale))
         case _ => Failure(new IllegalArgumentException("Ficheiro mal formatado"))
       }
     } catch {
-      case e: FileNotFoundException => println("FileNotFoundException occurred");
-      case e: IllegalArgumentException => Failure("IOException occurred");
+      case e: FileNotFoundException => e.printStackTrace; Failure(new FileNotFoundException("Ficheiro não encontrado"))
     }
   }
 
-  private def createShape(shape:String, color:Color, translate: Translate, scale: Scale): Shape3D = {
+   def createShape(shape:String, color:Color, translate: Translate, scale: Scale): Shape3D = {
     def setShapes(s:Shape3D, color:Color, translate: Translate, scale: Scale):Shape3D = {
       println(s"Box: ${s.toString}")
       s.setTranslateX(translate._1)

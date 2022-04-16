@@ -259,49 +259,50 @@ class Main extends Application {
 //  }
 
   def intersectsCamera(oct:Octree[Placement], camVolume: Cylinder):Unit = {
-    // Se for um ocNode
-    if(oct.isInstanceOf[OcNode[Placement]]) {
-      val ocnode = oct.asInstanceOf[OcNode[Placement]]
-      intersectsCamera(ocnode.up_00, camVolume)
-      intersectsCamera(ocnode.up_01, camVolume)
-      intersectsCamera(ocnode.up_10, camVolume)
-      intersectsCamera(ocnode.up_11, camVolume)
-      intersectsCamera(ocnode.down_00, camVolume)
-      intersectsCamera(ocnode.down_01, camVolume)
-      intersectsCamera(ocnode.down_10, camVolume)
-      intersectsCamera(ocnode.down_11, camVolume)
-    }
-
-    // Se for uma ocLeaf
-    if (oct.isInstanceOf[OcLeaf[Placement, Section]]) {
-      val ocleaf = oct.asInstanceOf[OcLeaf[Placement, Section]]
-      val listaSection = ocleaf.section._2
-
-      // Se a lista de nodes da section nao estiver vazia
-      if (!listaSection.isEmpty) {
-        listaSection.foldRight(0)((h,t) => {
-          h.asInstanceOf[Shape3D]
-          if (h.isInstanceOf[Box]) {
-            val box = h.asInstanceOf[Box]
-            if (box.getDrawMode.equals(DrawMode.LINE)) {
-              // Se intersetar
-              if(camVolume.asInstanceOf[Shape3D].getBoundsInParent.intersects(box.getBoundsInParent)) {
-                val greenMaterial = new PhongMaterial()
-                greenMaterial.setDiffuseColor(Color.rgb(0, 255, 0))
-                box.setMaterial(greenMaterial)
-              } else {
-                val redMaterial = new PhongMaterial()
-                redMaterial.setDiffuseColor(Color.rgb(150,0,0))
-                box.setMaterial(redMaterial)
-              }
-            }
-          }
-          ;t
-        })
+    oct match {
+      // Se for um ocNode
+      case _: OcNode[Placement] => {
+        val ocnode = oct.asInstanceOf[OcNode[Placement]]
+        intersectsCamera(ocnode.up_00, camVolume)
+        intersectsCamera(ocnode.up_01, camVolume)
+        intersectsCamera(ocnode.up_10, camVolume)
+        intersectsCamera(ocnode.up_11, camVolume)
+        intersectsCamera(ocnode.down_00, camVolume)
+        intersectsCamera(ocnode.down_01, camVolume)
+        intersectsCamera(ocnode.down_10, camVolume)
+        intersectsCamera(ocnode.down_11, camVolume)
       }
+
+        // Se for uma ocLeaf
+      case _: OcLeaf[Placement, Section] => {
+          val ocleaf = oct.asInstanceOf[OcLeaf[Placement, Section]]
+          val listaSection = ocleaf.section._2
+
+          // Se a lista de nodes da section nao estiver vazia
+          if (!listaSection.isEmpty) {
+            listaSection.foldRight(0)((h, t) => {
+              h.asInstanceOf[Shape3D]
+              if (h.isInstanceOf[Box]) {
+                val box = h.asInstanceOf[Box]
+                if (box.getDrawMode.equals(DrawMode.LINE)) {
+                  // Se intersetar
+                  if (camVolume.asInstanceOf[Shape3D].getBoundsInParent.intersects(box.getBoundsInParent)) {
+                    val greenMaterial = new PhongMaterial()
+                    greenMaterial.setDiffuseColor(Color.rgb(0, 255, 0))
+                    box.setMaterial(greenMaterial)
+                  } else {
+                    val redMaterial = new PhongMaterial()
+                    redMaterial.setDiffuseColor(Color.rgb(150, 0, 0))
+                    box.setMaterial(redMaterial)
+                  }
+                }
+              };
+              t
+            })
+          }
+        }
     }
   }
-
 
 
   override def init(): Unit = {

@@ -279,7 +279,7 @@ class Main extends Application {
           val listaSection = ocleaf.section._2
 
           // Se a lista de nodes da section nao estiver vazia
-          if (!listaSection.isEmpty) {
+          if (listaSection.nonEmpty) {
             listaSection.foldRight(0)((h, t) => {
               h.asInstanceOf[Shape3D]
               if (h.isInstanceOf[Box]) {
@@ -296,7 +296,7 @@ class Main extends Application {
                     box.setMaterial(redMaterial)
                   }
                 }
-              };
+              }
               t
             })
           }

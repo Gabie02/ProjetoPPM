@@ -1,4 +1,6 @@
+
 import javafx.scene.Node
+
 
 sealed trait Octree[+A]
 
@@ -12,6 +14,7 @@ case class OcNode[A](placement: A,
 case class OcLeaf[A, B](section: B) extends Octree[A]
 
 case object OcEmpty extends Octree[Nothing]
+
 
 case object OctreeUtils extends Octree[Nothing]
 
@@ -70,3 +73,4 @@ case object OctreeUtils extends Octree[Nothing]
     }
 
 }
+

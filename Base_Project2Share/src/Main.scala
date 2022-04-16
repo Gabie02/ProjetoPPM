@@ -15,6 +15,8 @@ import javafx.scene.paint.Color
 import javafx.scene.{PerspectiveCamera, Scene, SceneAntialiasing, SubScene}
 import javafx.scene.input.{KeyCode, ScrollEvent}
 
+import scala.runtime.Nothing$
+
 
 class Main extends Application {
 
@@ -79,6 +81,7 @@ class Main extends Application {
     cylinder1.setScaleY(2)
     cylinder1.setScaleZ(2)
     cylinder1.setMaterial(greenMaterial)
+
 
     val box1 = new Box(1, 1, 1)
     box1.setTranslateX(5)
@@ -167,13 +170,6 @@ class Main extends Application {
     stage.show
 
 
-    //oct1 - example of an Octree[Placement] that contains only one Node (i.e. cylinder1)
-    //In case of difficulties to implement task T2 this octree can be used as input for tasks T3, T4 and T5
-
-    val placement1: Placement = ((0, 0, 0), 8.0)
-    val sec1: Section = (((0.0,0.0,0.0), 4.0), List(cylinder1.asInstanceOf[Node]))
-    val ocLeaf1 = OcLeaf(sec1)
-    val oct1:Octree[Placement] = OcNode[Placement](placement1, ocLeaf1, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
 
     //example of bounding boxes (corresponding to the octree oct1) added manually to the world
     val b2 = new Box(8,8,8)
@@ -196,6 +192,36 @@ class Main extends Application {
       b3.setMaterial(greenMaterial)
     b3.setDrawMode(DrawMode.LINE)
 
+    //oct1 - example of an Octree[Placement] that contains only one Node (i.e. cylinder1)
+    //In case of difficulties to implement task T2 this octree can be used as input for tasks T3, T4 and T5
+
+    val placement1: Placement = ((0, 0, 0), 8.0)
+    val sec1: Section = (((0.0,0.0,0.0), 4.0), List(cylinder1.asInstanceOf[Node], b2.asInstanceOf[Node], b3.asInstanceOf[Node]))
+    val ocLeaf1 = OcLeaf(sec1)
+    val oct1:Octree[Placement] = OcNode[Placement](placement1, ocLeaf1, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
+
+    //example of bounding boxes (corresponding to the octree oct1) added manually to the world
+    //val b2 = new Box(8,8,8)
+    //translate because it is added by default to the coords (0,0,0)
+    //b2.setTranslateX(8/2)
+    //b2.setTranslateY(8/2)
+    //b2.setTranslateZ(8/2)
+    //b2.setMaterial(redMaterial)
+    //if(camVolume.asInstanceOf[Shape3D].getBoundsInParent.intersects(b2.getBoundsInParent))
+      //b2.setMaterial(greenMaterial)
+    //b2.setDrawMode(DrawMode.LINE)
+
+    //val b3 = new Box(4,4,4)
+    //translate because it is added by default to the coords (0,0,0)
+    //b3.setTranslateX(4/2)
+    //b3.setTranslateY(4/2)
+    //b3.setTranslateZ(4/2)
+    //b3.setMaterial(redMaterial)
+    //if(camVolume.asInstanceOf[Shape3D].getBoundsInParent.intersects(b3.getBoundsInParent))
+      //b3.setMaterial(greenMaterial)
+    //b3.setDrawMode(DrawMode.LINE)
+
+
     //adding boxes b2 and b3 to the world
     worldRoot.getChildren.add(b2)
     worldRoot.getChildren.add(b3)
@@ -204,21 +230,78 @@ class Main extends Application {
     scene.setOnKeyPressed(event => { event.getCode() match {
       case KeyCode.UP =>
         camVolume.setTranslateY(camVolume.getTranslateY - 2)
-
+        intersectsCamera(oct1,camVolume)
       //        worldRoot.getChildren.removeAll()
       case KeyCode.DOWN =>
         camVolume.setTranslateY(camVolume.getTranslateY + 2)
+        intersectsCamera(oct1,camVolume)
       //        worldRoot.getChildren.removeAll()
       case KeyCode.LEFT =>
         camVolume.setTranslateX(camVolume.getTranslateX - 2)
+        intersectsCamera(oct1,camVolume)
       //        worldRoot.getChildren.removeAll()
       case KeyCode.RIGHT =>
         camVolume.setTranslateX(camVolume.getTranslateX + 2)
+        intersectsCamera(oct1,camVolume)
       //        worldRoot.getChildren.removeAll()
     }
     })
 
   }
+
+//  def createTree():Octree[Placement] = {
+//    val placement1: Placement = ((0, 0, 0), 8.0)
+//    val sec1: Section = (((0.0,0.0,0.0), 4.0), List(cylinder1.asInstanceOf[Node]))
+//    val ocLeaf1 = OcLeaf(sec1)
+//    val oct1:Octree[Placement] = OcNode[Placement](placement1, ocLeaf1, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
+
+
+//  }
+
+  def intersectsCamera(oct:Octree[Placement], camVolume: Cylinder):Unit = {
+    // Se for um ocNode
+    if(oct.isInstanceOf[OcNode[Placement]]) {
+      val ocnode = oct.asInstanceOf[OcNode[Placement]]
+      intersectsCamera(ocnode.up_00, camVolume)
+      intersectsCamera(ocnode.up_01, camVolume)
+      intersectsCamera(ocnode.up_10, camVolume)
+      intersectsCamera(ocnode.up_11, camVolume)
+      intersectsCamera(ocnode.down_00, camVolume)
+      intersectsCamera(ocnode.down_01, camVolume)
+      intersectsCamera(ocnode.down_10, camVolume)
+      intersectsCamera(ocnode.down_11, camVolume)
+    }
+
+    // Se for uma ocLeaf
+    if (oct.isInstanceOf[OcLeaf[Placement, Section]]) {
+      val ocleaf = oct.asInstanceOf[OcLeaf[Placement, Section]]
+      val listaSection = ocleaf.section._2
+
+      // Se a lista de nodes da section nao estiver vazia
+      if (!listaSection.isEmpty) {
+        for (node <- listaSection) {
+          node.asInstanceOf[Shape3D]
+          if (node.isInstanceOf[Box]) {
+            val box = node.asInstanceOf[Box]
+            if (box.getDrawMode.equals(DrawMode.LINE)) {
+              // Se intersetar
+              if(camVolume.asInstanceOf[Shape3D].getBoundsInParent.intersects(box.getBoundsInParent)) {
+                val greenMaterial = new PhongMaterial()
+                greenMaterial.setDiffuseColor(Color.rgb(0, 255, 0))
+                box.setMaterial(greenMaterial)
+              } else {
+                val redMaterial = new PhongMaterial()
+                redMaterial.setDiffuseColor(Color.rgb(150,0,0))
+                box.setMaterial(redMaterial)
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+
 
   override def init(): Unit = {
     println("init")

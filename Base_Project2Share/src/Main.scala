@@ -1,3 +1,6 @@
+import Octree.{Placement, Section, auxScale}
+import Octree1.Octree1.partitionId
+import Octree1.root
 import com.sun.javafx.scene.shape.ShapeHelper.ShapeAccessor
 import javafx.application.Application
 import javafx.geometry.Insets
@@ -161,8 +164,6 @@ class Main extends Application {
       cameraView.setScaleY(cameraView.getScaleY * zoomfactor)
     })
 
-
-
     //setup and start the Stage
     stage.setTitle("PPM Project 21/22")
     stage.setScene(scene)
@@ -317,12 +318,34 @@ object FxApp {
   def main(args: Array[String]): Unit = {
     //------- Area de Testes -------
     //IO_Utils.readFromFile(s"$args")
+    //println("Partition: " + partitionId(root).toString())
+    val placement1: Placement = ((0, 0, 0), 8.0)
+    val cylinder1 = new Cylinder(0.5, 1, 10)
+    cylinder1.setTranslateX(2)
+    cylinder1.setTranslateY(2)
+    cylinder1.setTranslateZ(2)
+    cylinder1.setScaleX(2)
+    cylinder1.setScaleY(2)
+    cylinder1.setScaleZ(2)
+    val greenMaterial = new PhongMaterial()
+    greenMaterial.setDiffuseColor(Color.rgb(0,255,0))
+    cylinder1.setMaterial(greenMaterial)
 
-
-
+    val box1 = new Box(1, 1, 1)
+    box1.setTranslateX(5)
+    box1.setTranslateY(5)
+    box1.setTranslateZ(5)
+    box1.setMaterial(greenMaterial)
+    box1.getBoundsInParent
+    val sec1: Section = (((0.0,0.0,0.0), 4.0), List(cylinder1.asInstanceOf[Node], box1.asInstanceOf[Node]))
+    val ocLeaf1 = OcLeaf(sec1)
+    val oct1:Octree[Placement] = OcNode[Placement](placement1, ocLeaf1, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
+    auxScale(2, oct1)
     //------------------------------
     Application.launch(classOf[Main], args: _*)
 
   }
+
+
 }
 

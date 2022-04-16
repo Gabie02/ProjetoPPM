@@ -16,7 +16,7 @@ object Octree1 {
       List.fill(8)(new Box(new_size, new_size, new_size))
     }
 
-    def () = {
+
 
     }
 
@@ -25,4 +25,4 @@ object Octree1 {
   }
 
 
-}
+

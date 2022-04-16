@@ -279,10 +279,10 @@ class Main extends Application {
 
       // Se a lista de nodes da section nao estiver vazia
       if (!listaSection.isEmpty) {
-        for (node <- listaSection) {
-          node.asInstanceOf[Shape3D]
-          if (node.isInstanceOf[Box]) {
-            val box = node.asInstanceOf[Box]
+        listaSection.foldRight(0)((h,t) => {
+          h.asInstanceOf[Shape3D]
+          if (h.isInstanceOf[Box]) {
+            val box = h.asInstanceOf[Box]
             if (box.getDrawMode.equals(DrawMode.LINE)) {
               // Se intersetar
               if(camVolume.asInstanceOf[Shape3D].getBoundsInParent.intersects(box.getBoundsInParent)) {
@@ -296,7 +296,8 @@ class Main extends Application {
               }
             }
           }
-        }
+          ;t
+        })
       }
     }
   }

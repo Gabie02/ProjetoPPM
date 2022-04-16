@@ -301,6 +301,7 @@ class Main extends Application {
             })
           }
         }
+      case _ =>
     }
   }
 

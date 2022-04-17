@@ -1,16 +1,18 @@
 import OcNode.Placement
+import Octree.Section
 import javafx.scene.{Group, Node}
 import javafx.scene.shape.{Box, Cylinder, DrawMode, Shape3D}
 import javafx.scene.paint.{Color, PhongMaterial}
 
 sealed trait Octree[+A]
 
-case class OcNode[A](coords: A,
+case class OcNode[A](placement: A,
                      up_00: Octree[A], up_01: Octree[A],
                      up_10: Octree[A], up_11: Octree[A],
                      down_00: Octree[A], down_01: Octree[A],
                      down_10: Octree[A], down_11: Octree[A]
                     ) extends Octree[A] {
+
   def scaleOctree(fact:Double, oct:Octree[Placement]):Octree[Placement] = {
     OcNode.scaleOctree(fact, oct)
   }
@@ -21,7 +23,6 @@ case class OcNode[A](coords: A,
     OcNode.createTree2(worldRoot, shapeList, root)
 
 }
-
 
 case class OcLeaf[A, B](section: B) extends Octree[A]
 
@@ -36,54 +37,8 @@ object Octree {
   type Placement = (Point, Size) //1st point: origin, 2nd point: size
   type Section = (Placement, List[Node])
 
-  def auxScale(fact: Double, oct: Octree[Placement]): (Octree[Placement]) = {
-    val octSize = oct.asInstanceOf[OcNode[Placement]].coords._2
-    val octScale = octSize * fact
-
-    val list_ocNodes = List() :+ oct.asInstanceOf[OcNode[Placement]].up_00 :+ oct.asInstanceOf[OcNode[Placement]].up_01 :+
-      oct.asInstanceOf[OcNode[Placement]].up_10 :+ oct.asInstanceOf[OcNode[Placement]].up_11 :+ oct.asInstanceOf[OcNode[Placement]].down_00 :+
-      oct.asInstanceOf[OcNode[Placement]].down_01 :+ oct.asInstanceOf[OcNode[Placement]].down_10 :+ oct.asInstanceOf[OcNode[Placement]].down_11
-
-    // Da lista de nodes, tirar aqueles que sao ocLeafs
-    val list_ocLeaf = list_ocNodes.filter(x => x.isInstanceOf[OcLeaf[Octree[Section], Section]])
-    //println("lista_ocLeaf_auxScale ------>" + list_ocLeaf)
-    val shapes_list : List[Node] = List()
-    //Se a lista de ocLeafs não estiver vazia, vamos percorrê-la
-    if (list_ocLeaf.nonEmpty) {
-
-      list_ocLeaf.foldRight(0)((h, t) => {
-        //Criar lista de modelos graficos da ocleaf
-        shapes_list :: h.asInstanceOf[OcLeaf[Octree[Section], Section]].section._2
-        //println("Shapes_list1: " + shapes_list)
-
-        //Percorrer lista de modelos graficos da ocLeaf
-        shapes_list.foldRight(0)((h, t) => {
-          println("shape before: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
-          h.setScaleX(h.getScaleX*fact)
-          h.setScaleY(h.getScaleY * fact)
-          h.setScaleY(h.getScaleZ * fact)
-          println("shape after: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
-          ;t
-        });t
-      })
-
-      val placement1: Placement = (oct.asInstanceOf[OcNode[Placement]].coords._1, octScale)
-      val sec1: Section = (placement1, shapes_list)
-      val ocLeaf1 = OcLeaf(sec1)
-      val scaleOctree:Octree[Placement] = OcNode[Placement](placement1, ocLeaf1,list_ocNodes(1), list_ocNodes(2), list_ocNodes(3), list_ocNodes(4),
-        list_ocNodes(5), list_ocNodes(6), list_ocNodes(7))
-
-      scaleOctree
-    }
-    else {
-      val placement1: Placement = (oct.asInstanceOf[OcNode[Placement]].coords._1,octScale)
-      val scaleOctree:Octree[Placement] = OcNode[Placement](placement1, list_ocNodes(0),list_ocNodes(1), list_ocNodes(2), list_ocNodes(3), list_ocNodes(4),
-        list_ocNodes(5), list_ocNodes(6), list_ocNodes(7))
-      scaleOctree
-    }
-  }
-
 }
+
 object OcNode {
 
   //Auxiliary types
@@ -94,31 +49,46 @@ object OcNode {
     (p1._1 + p2._1, p1._2 + p2._2, p1._3 + p2._3)
   }
 
+  def scaleOctree(fact: Double, oct: Octree[Placement]): Octree[Placement]  = fact match {
 
-  //Shape3D is an abstract class that extends javafx.scene.Node
-  //Box and Cylinder are subclasses of Shape3D
-  type Section = (Placement, List[Node])  //example: ( ((0.0,0.0,0.0), 2.0), List(new Cylinder(0.5, 1, 10)))
+    case 0.5| 2  => auxScale(fact,oct: Octree[Placement])
+    case _ => println("--> Fator inválido!!!"); throw new IllegalArgumentException ("Argumento inválido: Não foi possível efetuar scale, factor inválido ")
+  }
 
-  def scaleOctree(fact:Double, oct:Octree[Placement]):Octree[Placement] = {
+  def auxScale (fact: Double, oct: Octree[Placement]): Octree[Placement] = {
+
     val root = oct.asInstanceOf[OcNode[Placement]]
-    val inputSize = root.productArity
-    val newroot = OcNode[Placement](root.coords, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
-    for(a <- 0 to inputSize - 1) {
-      val partition = root.productElement(a)
-      if(partition.isInstanceOf[OcNode[Placement]]) {
+    println("Root before: " + root)
+
+    val list_Ocnodes = createAttributesList(root)
+    println("Lista list_Ocnodes: " + list_Ocnodes)
+
+    list_Ocnodes.foldRight()((h, t) => {
+
+      if (h.isInstanceOf[OcNode[Placement]]) {
         scaleOctree(fact, oct)
-      } else if(partition.isInstanceOf[OcLeaf[Placement,Section]]) {
-        val shapelist = partition.asInstanceOf[OcLeaf[Placement, Section]].section._2
-        val shapeScaled = (shapelist foldRight List[Node]()) ((h,t) => {
+      }
+      if (h.isInstanceOf[OcLeaf[Placement, Section]]) {
+        val shapelist = h.asInstanceOf[OcLeaf[Placement, Section]].section._2
+        (shapelist foldRight List[Node]()) ((h, t) => {
+
+          println("shape before: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
           h.setScaleX(h.getScaleX * fact)
           h.setScaleY(h.getScaleY * fact)
           h.setScaleZ(h.getScaleZ * fact)
-          h::t
+          //if (wiredBox.asInstanceOf[Shape3D].getBoundsInParent.intersects(h.getBoundsInParent){
+          //}
+          //else {
+          println("shape after: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
+          h :: t
+          //}
         })
       }
-    }
+    })
+    println("Root after: " + root)
     root
   }
+
   def createAttributesList(e:OcNode[Placement]):List[Octree[Placement]] = {
     def iterate(e:OcNode[Placement], l:List[Octree[Placement]], s:Int):List[Octree[Placement]] = {
       s match {

@@ -7,7 +7,7 @@ object IO_Utils {
 
   // Consergue ler ficheiros que estejam na mesma diretoria da main
   def readFromFile(file: String):Array[Shape3D] = {
-    var shapes = new ListBuffer[Shape3D]()
+    val shapes = new ListBuffer[Shape3D]()
     val dir = System.getProperty("user.dir")
     val bufferedSource = Source.fromFile(s"$dir/$file")
     for (line <- bufferedSource.getLines){
@@ -16,7 +16,6 @@ object IO_Utils {
 
     }
     bufferedSource.close
-    println(shapes)
     shapes.toArray
   }
 

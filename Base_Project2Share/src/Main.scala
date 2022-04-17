@@ -91,10 +91,10 @@ class Main extends Application {
 
     //Leitura do ficheiro de configuração
     println("Introduza o nome do ficheiro: ")
-    val file = scala.io.StdIn.readLine()
-    val listaShapes = IO_Utils.readFromFile(file)
+//    val file = scala.io.StdIn.readLine()
+    val listaShapes = IO_Utils.readFromFile("conf.txt")
     //listaShapes.foreach(e => println(e))
-    println(listaShapes)
+//    println(listaShapes)
 
     // 3D objects (group of nodes - javafx.scene.Node) that will be provide to the subScene
     val worldRoot:Group = new Group(wiredBox, camVolume, lineX, lineY, lineZ, cylinder1, box1)
@@ -284,7 +284,7 @@ class Main extends Application {
     //adding boxes b2 and b3 to the world
 //    worldRoot.getChildren.add(b2)
 //    worldRoot.getChildren.add(b3)
-val oct2 = OcNode.createTree2(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32))
+val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32))
 
     //Permite mover a camera com as arrow keys
     scene.setOnKeyPressed(event => { event.getCode() match {
@@ -325,6 +325,7 @@ val oct2 = OcNode.createTree2(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 3
     oct match {
       // Se for um ocNode
       case _: OcNode[Placement] =>
+        println("ISTO É UM NODE")
         val ocnode = oct.asInstanceOf[OcNode[Placement]]
         intersectsCamera(ocnode.up_00, camVolume)
         intersectsCamera(ocnode.up_01, camVolume)
@@ -338,6 +339,7 @@ val oct2 = OcNode.createTree2(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 3
 
         // Se for uma ocLeaf
       case _: OcLeaf[Placement, Section] =>
+        println("ISTO É UMA LEAF")
           val ocleaf = oct.asInstanceOf[OcLeaf[Placement, Section]]
           val listaSection = ocleaf.section._2
           // Se a lista de nodes da section nao estiver vazia
@@ -364,6 +366,7 @@ val oct2 = OcNode.createTree2(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 3
           }
 
       case _ =>
+        println("ISTO É EMPTY")
     }
   }
 
@@ -382,7 +385,7 @@ object FxApp {
 
   def main(args: Array[String]): Unit = {
     //------- Area de Testes -------
-    //IO_Utils.readFromFile(s"$args")
+//    IO_Utils.readFromFile(s"$args")
     //println("Partition: " + partitionId(root).toString())
 
     //------------------------------

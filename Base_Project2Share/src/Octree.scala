@@ -205,10 +205,10 @@ object OcNode {
   def createCorners(placement: Placement):List[Point] = {
     val point = placement._1 // A root n vai ser sempre o quadrado vermelho grande?
     val size = placement._2
-    List():+addTwoPoints(point, (0.0,0.0,0.0)):+addTwoPoints(point, (0.0,size / 2,0.0)):+
-      addTwoPoints(point, (size / 2,0.0,0.0)):+addTwoPoints(point, (size / 2,size / 2,0.0)):+
-      addTwoPoints(point, (0.0,0.0,size / 2)):+addTwoPoints(point, (0.0,size / 2,size / 2)):+
-      addTwoPoints(point, (size / 2,0.0,size / 2)):+addTwoPoints(point, (size / 2,size / 2,size / 2))
+    List():+addTwoPoints(point, (size/4,size/4,size/4)):+addTwoPoints(point, (size/4 + size/2,size/4,size/4)):+
+      addTwoPoints(point, (size/4,size/4 + size/2,size/4)):+addTwoPoints(point, (size/4,size/4,size/4 + size/2)):+
+      addTwoPoints(point, (size/4 + size/2,size/4 + size/2,size/4)):+addTwoPoints(point, (size/4 + size/2,size/4 ,size/4 + size/2)):+
+      addTwoPoints(point, (size/4,size/4 + size/2,size/4 + size/2)):+addTwoPoints(point, (size/4 + size/2,size/4 + size/2,size/4 + size/2))
 
   }
 

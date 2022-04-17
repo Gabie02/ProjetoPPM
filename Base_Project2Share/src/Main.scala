@@ -222,10 +222,10 @@ class Main extends Application {
     //b3.setDrawMode(DrawMode.LINE)
 
 
-    val teste1 = new Box(8.0,8.0,8.0)
+    val teste1 = new Box(16.0,16.0,16.0)
     teste1.setTranslateX(8)
     teste1.setTranslateY(8)
-    teste1.setTranslateZ(24)
+    teste1.setTranslateZ(8)
     teste1.setMaterial(redMaterial)
     teste1.setDrawMode(DrawMode.LINE)
     val teste2 = new Box(8.0,8.0,8.0)
@@ -272,42 +272,43 @@ class Main extends Application {
     teste44.setMaterial(redMaterial)
     teste44.setDrawMode(DrawMode.LINE)
 
-    worldRoot.getChildren.add(teste1)
-    worldRoot.getChildren.add(teste2)
-    worldRoot.getChildren.add(teste3)
-    worldRoot.getChildren.add(teste4)
-    worldRoot.getChildren.add(teste11)
-    worldRoot.getChildren.add(teste22)
-    worldRoot.getChildren.add(teste33)
-    worldRoot.getChildren.add(teste44)
+    //worldRoot.getChildren.add(teste1)
+    //worldRoot.getChildren.add(teste2)
+    //worldRoot.getChildren.add(teste3)
+    //worldRoot.getChildren.add(teste4)
+    //worldRoot.getChildren.add(teste11)
+    //worldRoot.getChildren.add(teste22)
+    //worldRoot.getChildren.add(teste33)
+    //worldRoot.getChildren.add(teste44)
 
     //adding boxes b2 and b3 to the world
 //    worldRoot.getChildren.add(b2)
 //    worldRoot.getChildren.add(b3)
+val oct2 = OcNode.createTree2(worldRoot, listaShapes.toList,((0.0,0.0,0.0), 32))
 
     //Permite mover a camera com as arrow keys
     scene.setOnKeyPressed(event => { event.getCode() match {
       case KeyCode.UP =>
         camVolume.setTranslateY(camVolume.getTranslateY - 2)
-        intersectsCamera(oct1,camVolume)
+        intersectsCamera(oct2,camVolume)
       //        worldRoot.getChildren.removeAll()
       case KeyCode.DOWN =>
         camVolume.setTranslateY(camVolume.getTranslateY + 2)
-        intersectsCamera(oct1,camVolume)
+        intersectsCamera(oct2,camVolume)
       //        worldRoot.getChildren.removeAll()
       case KeyCode.LEFT =>
         camVolume.setTranslateX(camVolume.getTranslateX - 2)
-        intersectsCamera(oct1,camVolume)
+        intersectsCamera(oct2,camVolume)
       //        worldRoot.getChildren.removeAll()
       case KeyCode.RIGHT =>
         camVolume.setTranslateX(camVolume.getTranslateX + 2)
-        intersectsCamera(oct1,camVolume)
+        intersectsCamera(oct2,camVolume)
       //        worldRoot.getChildren.removeAll()
       case _ =>
     }
     })
-    OcNode.createTree2(worldRoot, listaShapes.toList,((0.0,0.0,0.0), 32))
-    intersectsCamera(oct1, camVolume)
+    //val oct2 = OcNode.createTree2(worldRoot, listaShapes.toList,((0.0,0.0,0.0), 32))
+    intersectsCamera(oct2, camVolume)
 
   }
 

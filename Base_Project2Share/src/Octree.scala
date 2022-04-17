@@ -175,10 +175,11 @@ object OcNode {
   def createCorners(placement: Placement):List[Point] = {
     val point = placement._1 // A root n vai ser sempre o quadrado vermelho grande?
     val size = placement._2
-    List():+addTwoPoints(point, (size/4,size/4,size/4)):+addTwoPoints(point, (size/4 + size/2,size/4,size/4)):+
-      addTwoPoints(point, (size/4,size/4 + size/2,size/4)):+addTwoPoints(point, (size/4,size/4,size/4 + size/2)):+
-      addTwoPoints(point, (size/4 + size/2,size/4 + size/2,size/4)):+addTwoPoints(point, (size/4 + size/2,size/4 ,size/4 + size/2)):+
-      addTwoPoints(point, (size/4,size/4 + size/2,size/4 + size/2)):+addTwoPoints(point, (size/4 + size/2,size/4 + size/2,size/4 + size/2))
+    val newPoint = new Point(point._1 - size/2,point._2 - size/2,point._3 - size/2)
+    List():+addTwoPoints(newPoint, (size/4,size/4,size/4)):+addTwoPoints(newPoint, (size/4,size/4,size/4 + size/2)):+
+      addTwoPoints(newPoint, (size/4 + size/2,size/4,size/4)):+addTwoPoints(newPoint, (size/4 + size/2,size/4,size/4 + size/2)):+
+      addTwoPoints(newPoint, (size/4,size/4 + size/2,size/4)):+addTwoPoints(newPoint, (size/4,size/4 + size/2 ,size/4 + size/2)):+
+      addTwoPoints(newPoint, (size/4 + size/2,size/4 + size/2,size/4)):+addTwoPoints(newPoint, (size/4 + size/2,size/4 + size/2,size/4 + size/2))
 
   }
 
@@ -283,7 +284,7 @@ object OcNode {
       (corners foldRight false) ((h,t) =>{
         val partition = createWiredBox(h,node._2/2)
         println(s"Partiçao para o canto $h com tamanho ${node._2/2} contem o shape $s?: ${partition.getBoundsInParent.contains(s.getBoundsInParent)}")
-        if(partition.getBoundsInParent.contains(s.getBoundsInParent)) true || t else false || t
+        if(partition.getBoundsInParent.contains(s.getBoundsInParent)) true else t
       } )
     }
 

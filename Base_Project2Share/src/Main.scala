@@ -284,7 +284,7 @@ class Main extends Application {
     //adding boxes b2 and b3 to the world
 //    worldRoot.getChildren.add(b2)
 //    worldRoot.getChildren.add(b3)
-val oct2 = OcNode.createTree2(worldRoot, listaShapes.toList,((0.0,0.0,0.0), 32))
+val oct2 = OcNode.createTree2(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32))
 
     //Permite mover a camera com as arrow keys
     scene.setOnKeyPressed(event => { event.getCode() match {

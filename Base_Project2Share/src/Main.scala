@@ -174,7 +174,7 @@ class Main extends Application {
 
 
     //example of bounding boxes (corresponding to the octree oct1) added manually to the world
-    val b2 = new Box(8,8,8)
+    val b2 = new Box(8.0,8.0,8.0)
     //translate because it is added by default to the coords (0,0,0)
     b2.setTranslateX(8/2)
     b2.setTranslateY(8/2)
@@ -198,7 +198,7 @@ class Main extends Application {
     val ocLeaf1 = OcLeaf(sec1)
     var oct1:Octree[Placement] = OcNode[Placement](placement1, ocLeaf1, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
 
-    oct1 = scaleOctree(0.5, oct1)
+    oct1 = scaleOctree(2, oct1)
 
     //example of bounding boxes (corresponding to the octree oct1) added manually to the world
     //val b2 = new Box(8,8,8)

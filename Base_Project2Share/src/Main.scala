@@ -1,4 +1,5 @@
-import Octree.{Placement, Section, auxScale}
+import OcNode.scaleOctree
+import Octree.{Placement, Section}
 import Octree1.Octree1.partitionId
 import Octree1.root
 import com.sun.javafx.scene.shape.ShapeHelper.ShapeAccessor
@@ -16,7 +17,6 @@ import javafx.scene.{PerspectiveCamera, Scene, SceneAntialiasing, SubScene}
 import javafx.scene.input.{KeyCode, ScrollEvent}
 
 import scala.runtime.Nothing$
-
 
 class Main extends Application {
 
@@ -82,15 +82,17 @@ class Main extends Application {
     cylinder1.setScaleZ(2)
     cylinder1.setMaterial(greenMaterial)
 
-
     val box1 = new Box(1, 1, 1)
     box1.setTranslateX(5)
     box1.setTranslateY(5)
     box1.setTranslateZ(5)
     box1.setMaterial(greenMaterial)
     box1.getBoundsInParent
-    val listaShapes = IO_Utils.readFromFile("conf.txt")
-    println(" -------------------------- ")
+
+    //Leitura do ficheiro de configuração
+    println("Introduza o nome do ficheiro: ")
+    val file = scala.io.StdIn.readLine()
+    val listaShapes = IO_Utils.readFromFile(file)
     //listaShapes.foreach(e => println(e))
     println(listaShapes)
 
@@ -198,7 +200,9 @@ class Main extends Application {
     val placement1: Placement = ((0, 0, 0), 8.0)
     val sec1: Section = (((0.0,0.0,0.0), 4.0), List(cylinder1.asInstanceOf[Node], b2.asInstanceOf[Node], b3.asInstanceOf[Node]))
     val ocLeaf1 = OcLeaf(sec1)
-    val oct1:Octree[Placement] = OcNode[Placement](placement1, ocLeaf1, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
+    var oct1:Octree[Placement] = OcNode[Placement](placement1, ocLeaf1, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
+
+    oct1 = scaleOctree(0.5, oct1)
 
     //example of bounding boxes (corresponding to the octree oct1) added manually to the world
     //val b2 = new Box(8,8,8)
@@ -385,28 +389,7 @@ object FxApp {
     //------- Area de Testes -------
     //IO_Utils.readFromFile(s"$args")
     //println("Partition: " + partitionId(root).toString())
-    val placement1: Placement = ((0, 0, 0), 8.0)
-    val cylinder1 = new Cylinder(0.5, 1, 10)
-    cylinder1.setTranslateX(2)
-    cylinder1.setTranslateY(2)
-    cylinder1.setTranslateZ(2)
-    cylinder1.setScaleX(2)
-    cylinder1.setScaleY(2)
-    cylinder1.setScaleZ(2)
-    val greenMaterial = new PhongMaterial()
-    greenMaterial.setDiffuseColor(Color.rgb(0,255,0))
-    cylinder1.setMaterial(greenMaterial)
 
-    val box1 = new Box(1, 1, 1)
-    box1.setTranslateX(5)
-    box1.setTranslateY(5)
-    box1.setTranslateZ(5)
-    box1.setMaterial(greenMaterial)
-    box1.getBoundsInParent
-    val sec1: Section = (((0.0,0.0,0.0), 4.0), List(cylinder1.asInstanceOf[Node], box1.asInstanceOf[Node]))
-    val ocLeaf1 = OcLeaf(sec1)
-    val oct1:Octree[Placement] = OcNode[Placement](placement1, ocLeaf1, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
-    auxScale(2, oct1)
     //------------------------------
     Application.launch(classOf[Main], args: _*)
 

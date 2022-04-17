@@ -50,7 +50,6 @@ object OcNode {
   }
 
   def scaleOctree(fact: Double, oct: Octree[Placement]): Octree[Placement]  = fact match {
-
     case 0.5| 2  => auxScale(fact,oct: Octree[Placement])
     case _ => println("--> Fator inválido!!!"); throw new IllegalArgumentException ("Argumento inválido: Não foi possível efetuar scale, factor inválido ")
   }
@@ -58,7 +57,7 @@ object OcNode {
   def auxScale (fact: Double, oct: Octree[Placement]): Octree[Placement] = {
 
     val root = oct.asInstanceOf[OcNode[Placement]]
-    println("Root before: " + root)
+//    println("Root before: " + root)
 
     val list_Ocnodes = createAttributesList(root)
     println("Lista list_Ocnodes: " + list_Ocnodes)
@@ -74,7 +73,7 @@ object OcNode {
         val shapeList = h.asInstanceOf[OcLeaf[Placement, Section]].section._2
         (shapeList foldRight List[Node]()) ((h, t) => {
 
-          println("Shape before: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
+//          println("Shape before: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
           val originalX = h.getScaleX
           val originalY = h.getScaleY
           val originalZ = h.getScaleZ
@@ -83,7 +82,7 @@ object OcNode {
           h.setScaleZ(originalZ * fact)
 
           if (wiredBox.getBoundsInParent.contains(h.getBoundsInParent)){
-            println("Shape after: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
+//            println("Shape after: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
             h :: t
           }
           else {
@@ -96,22 +95,16 @@ object OcNode {
         })
       }
     })
-    println("Root after: " + root)
+//    println("Root after: " + root)
     root
   }
 
   def createAttributesList(e:OcNode[Placement]):List[Octree[Placement]] = {
     def iterate(e:OcNode[Placement], l:List[Octree[Placement]], s:Int):List[Octree[Placement]] = {
-      s match {
-        case x => if (x == e.productArity) l else {
-          iterate(e, l :+ e.productElement(s).asInstanceOf[Octree[Placement]], s + 1)}
-      }
+       if (s == e.productArity) l else iterate(e, l :+ e.productElement(s).asInstanceOf[Octree[Placement]], s + 1)
     }
     iterate(e,List[Octree[Placement]](), 1)
   }
-
-
-
 
   def putElementAt(node:Octree[Placement], element:Octree[Placement], index:Int):Octree[Placement] = {
     index match {
@@ -136,14 +129,15 @@ object OcNode {
       addTwoPoints(newPoint, (size/4 + size/2,size/4 + size/2,size/4)):+addTwoPoints(newPoint, (size/4 + size/2,size/4 + size/2,size/4 + size/2))
 
   }
+
   def canBeDivided(node:Placement, s:Shape3D):Boolean = {
     println("Pode ser dividida?")
     val corners = createCorners(node)
-    (corners foldRight false) ((h,t) =>{
+    (corners foldRight false) ((h,t) => {
       val partition = createWiredBox(h,node._2/2)
       println(s"Partiçao para o canto $h com tamanho ${node._2/2} contem o shape $s?: ${partition.getBoundsInParent.contains(s.getBoundsInParent)}")
       if(partition.getBoundsInParent.contains(s.getBoundsInParent)) true else t
-    } )
+    })
   }
 
   def createWiredBox(origin: Point, size:Size):Shape3D = {
@@ -161,7 +155,7 @@ object OcNode {
   def createTree(worldRoot:Group,shapeList: List[Shape3D],root: Placement):Octree[Placement] = {
     val size = root._2
     val emptyOcNode = new OcNode[Placement](((0.0,0.0,0.0),size/2),OcEmpty,OcEmpty,OcEmpty,OcEmpty,OcEmpty,OcEmpty,OcEmpty,OcEmpty)
-    val corners =createCorners(root)
+    val corners = createCorners(root)
 
     //Para cada partição ver se se existe alguma figura que esteja contida na mesma
     def iterateThroughCorners(finalTree: Octree[Placement],corners:List[Point],i:Int,stop:Int):Octree[Placement] = {
@@ -275,20 +269,30 @@ object OcNode {
   def mapColourEffect(func: Color => Color)(oct:Octree[Placement]): Octree[Placement] = {
     val root = oct.asInstanceOf[OcNode[Placement]]
     val inputSize = root.productArity
-    for(a <- 0 to inputSize - 1) {
-      val partition = root.productElement(a)
+
+    def iterate(root:OcNode[Placement], i:Int, stop:Int):Octree[Placement] = {
+
+      val partition = root.productElement(i)
+
       if(partition.isInstanceOf[OcNode[Placement]]){
+
         mapColourEffect(func)(partition.asInstanceOf[Octree[Placement]])
+
       } else if(partition.isInstanceOf[OcLeaf[Placement,Section]]) {
-        val shapelist:List[Node] = partition.asInstanceOf[OcLeaf[Placement,Section]].section._2
-        (shapelist foldRight List[Node]())((h,t) => {
+
+        val shapeList:List[Node] = partition.asInstanceOf[OcLeaf[Placement,Section]].section._2
+        (shapeList foldRight List[Node]())((h,t) => {
+
           val material = h.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial]
           val color:Color = material.getDiffuseColor
           material.setDiffuseColor(func(color));t
+
         })
+
       }
+      if(i < stop) iterate(root, i+1, stop) else root
     }
-    root
+    iterate(root, 0, inputSize-1)
   }
 
 }

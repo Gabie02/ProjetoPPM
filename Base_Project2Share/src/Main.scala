@@ -1,8 +1,5 @@
-import OcNode.scaleOctree
+import OcNode.{mapColourEffect, scaleOctree}
 import Octree.{Placement, Section}
-import Octree1.Octree1.partitionId
-import Octree1.root
-import com.sun.javafx.scene.shape.ShapeHelper.ShapeAccessor
 import javafx.application.Application
 import javafx.geometry.Insets
 import javafx.scene.paint.PhongMaterial
@@ -148,15 +145,6 @@ class Main extends Application {
 
     val scene = new Scene(root, 810, 610, true, SceneAntialiasing.BALANCED)
 
-    //Mouse left click interaction
-//    scene.setOnMouseClicked((event) => {
-//      camVolume.setTranslateX(camVolume.getTranslateX + 2)
-//      worldRoot.getChildren.removeAll()
-//    })
-
-    //Tentar fazer com que o scroll amplie a imagem
-    //scene.setOnScroll(() =>{})
-
     scene.setOnScroll(event => {
       var zoomfactor = 1.05
       if(event.getDeltaY() < 0)
@@ -170,8 +158,6 @@ class Main extends Application {
     stage.setTitle("PPM Project 21/22")
     stage.setScene(scene)
     stage.show
-
-
 
     //example of bounding boxes (corresponding to the octree oct1) added manually to the world
     val b2 = new Box(8.0,8.0,8.0)
@@ -309,17 +295,8 @@ val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32
     })
     //val oct2 = OcNode.createTree2(worldRoot, listaShapes.toList,((0.0,0.0,0.0), 32))
     intersectsCamera(oct2, camVolume)
-
+//    mapColourEffect(x => OcNode.greenRemove(x))(oct2)
   }
-
-//  def createTree():Octree[Placement] = {
-//    val placement1: Placement = ((0, 0, 0), 8.0)
-//    val sec1: Section = (((0.0,0.0,0.0), 4.0), List(cylinder1.asInstanceOf[Node]))
-//    val ocLeaf1 = OcLeaf(sec1)
-//    val oct1:Octree[Placement] = OcNode[Placement](placement1, ocLeaf1, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
-
-
-//  }
 
   def intersectsCamera(oct:Octree[Placement], camVolume: Cylinder):Unit = {
     oct match {

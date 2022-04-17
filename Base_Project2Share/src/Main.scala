@@ -180,8 +180,6 @@ class Main extends Application {
     b2.setTranslateY(8/2)
     b2.setTranslateZ(8/2)
     b2.setMaterial(redMaterial)
-    if(camVolume.asInstanceOf[Shape3D].getBoundsInParent.intersects(b2.getBoundsInParent))
-      b2.setMaterial(greenMaterial)
     b2.setDrawMode(DrawMode.LINE)
 
     val b3 = new Box(4,4,4)
@@ -190,8 +188,6 @@ class Main extends Application {
     b3.setTranslateY(4/2)
     b3.setTranslateZ(4/2)
     b3.setMaterial(redMaterial)
-    if(camVolume.asInstanceOf[Shape3D].getBoundsInParent.intersects(b3.getBoundsInParent))
-      b3.setMaterial(greenMaterial)
     b3.setDrawMode(DrawMode.LINE)
 
     //oct1 - example of an Octree[Placement] that contains only one Node (i.e. cylinder1)
@@ -344,7 +340,6 @@ val oct2 = OcNode.createTree2(worldRoot, listaShapes.toList,((0.0,0.0,0.0), 32))
       case _: OcLeaf[Placement, Section] =>
           val ocleaf = oct.asInstanceOf[OcLeaf[Placement, Section]]
           val listaSection = ocleaf.section._2
-
           // Se a lista de nodes da section nao estiver vazia
           if (listaSection.nonEmpty) {
             listaSection.foldRight(0)((h, t) => {

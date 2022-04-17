@@ -255,19 +255,19 @@ object OcNode {
           //Se puder ser dividida em ainda mais partições, criar um node, que representa um novo ramo
           if (canBeDivided((corners(a), size / 2), h)) {
             println(s"A partição pode ser dividida para o shape $h. Fazer uma nova tree")
-            createTree2(worldRoot, shapeList, (corners(a), size / 2))
+            finalTree = createTree2(worldRoot, shapeList, (corners(a), size / 2)).asInstanceOf[OcNode[Placement]]
             //Se não puder ser dividida
-            //Se nessa partição já existir uma leaf, adiconar o novo objeto à leaf
+            //Se nessa partição já existir uma leaf, adicionar o novo objeto à leaf
           } else if(finalTree.productElement(a).isInstanceOf[OcLeaf[Placement,Section]]) {
             println(s"A partição NÃO PODE ser dividida para o shape $h. Ver se já existe uma leaf")
             val list = finalTree.productElement(a).asInstanceOf[OcLeaf[Placement,Section]].section._2
             worldRoot.getChildren.add(partition)
-            putElementAt(finalTree, new OcLeaf[Placement,Section]((corners(a),size/2), list:+h:+partition), a) //retorna uma nova árvore com a lista atualizada e o elemento, mais a partição, no seu sitio
+            finalTree = putElementAt(finalTree, new OcLeaf[Placement,Section]((corners(a),size/2), list:+h:+partition), a).asInstanceOf[OcNode[Placement]] //retorna uma nova árvore com a lista atualizada e o elemento, mais a partição, no seu sitio
             //Se não existir uma leaf ainda, fazer uma nova
           } else {
             println(s"A partição NÃO PODE ser dividida para o shape $h. Fazer uma nova leaf")
             worldRoot.getChildren.add(partition)
-            putElementAt(finalTree, new OcLeaf[Placement,Section]((corners(a),size/2), List(h, partition)), a) //retorna uma nova árvore com a lista com o elemento e a partição no seu sitio
+            finalTree = putElementAt(finalTree, new OcLeaf[Placement,Section]((corners(a),size/2), List(h, partition)), a).asInstanceOf[OcNode[Placement]] //retorna uma nova árvore com a lista com o elemento e a partição no seu sitio
           }
         }
         println("Ver o próximo Shape")

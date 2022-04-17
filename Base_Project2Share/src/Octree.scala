@@ -63,25 +63,36 @@ object OcNode {
     val list_Ocnodes = createAttributesList(root)
     println("Lista list_Ocnodes: " + list_Ocnodes)
 
+    val wiredBox = createWiredBox(root.placement._1, 32)
+
     list_Ocnodes.foldRight()((h, t) => {
 
       if (h.isInstanceOf[OcNode[Placement]]) {
         scaleOctree(fact, oct)
       }
       if (h.isInstanceOf[OcLeaf[Placement, Section]]) {
-        val shapelist = h.asInstanceOf[OcLeaf[Placement, Section]].section._2
-        (shapelist foldRight List[Node]()) ((h, t) => {
+        val shapeList = h.asInstanceOf[OcLeaf[Placement, Section]].section._2
+        (shapeList foldRight List[Node]()) ((h, t) => {
 
-          println("shape before: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
-          h.setScaleX(h.getScaleX * fact)
-          h.setScaleY(h.getScaleY * fact)
-          h.setScaleZ(h.getScaleZ * fact)
-          //if (wiredBox.asInstanceOf[Shape3D].getBoundsInParent.intersects(h.getBoundsInParent){
-          //}
-          //else {
-          println("shape after: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
-          h :: t
-          //}
+          println("Shape before: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
+          val originalX = h.getScaleX
+          val originalY = h.getScaleY
+          val originalZ = h.getScaleZ
+          h.setScaleX(originalX * fact)
+          h.setScaleY(originalY * fact)
+          h.setScaleZ(originalZ * fact)
+
+          if (wiredBox.getBoundsInParent.contains(h.getBoundsInParent)){
+            println("Shape after: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
+            h :: t
+          }
+          else {
+            println("Shape fora dos limites")
+            h.setScaleX(originalX)
+            h.setScaleY(originalY)
+            h.setScaleZ(originalZ)
+            t
+          }
         })
       }
     })
@@ -298,7 +309,5 @@ object OcNode {
     box.setDrawMode(DrawMode.LINE)
     box
   }
-
-
 }
 

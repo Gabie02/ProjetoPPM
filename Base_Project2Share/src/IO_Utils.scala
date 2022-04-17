@@ -20,8 +20,6 @@ object IO_Utils {
     shapes.toArray
   }
 
-
-
   def convertShapes(line: String):Shape3D = {
     val gmc = GraphicModelConstructor()
     gmc.buildObject(line)

@@ -1,19 +1,17 @@
-import OcNode.{mapColourEffect, scaleOctree}
-import Octree.{Placement, Section}
+import OcNode.{auxScale, mapColourEffect}
 import javafx.application.Application
 import javafx.geometry.Insets
 import javafx.scene.paint.PhongMaterial
 import javafx.scene.shape._
-import javafx.scene.transform.{Rotate, Translate}
+import javafx.scene.transform.{Rotate}
 import javafx.scene.{Group, Node}
 import javafx.stage.Stage
 import javafx.geometry.Pos
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import javafx.scene.{PerspectiveCamera, Scene, SceneAntialiasing, SubScene}
-import javafx.scene.input.{KeyCode, ScrollEvent}
+import javafx.scene.input.{KeyCode}
 
-import scala.runtime.Nothing$
 
 class Main extends Application {
 
@@ -79,19 +77,11 @@ class Main extends Application {
     cylinder1.setScaleZ(2)
     cylinder1.setMaterial(greenMaterial)
 
-    val box1 = new Box(1, 1, 1)
-    box1.setTranslateX(5)
-    box1.setTranslateY(5)
-    box1.setTranslateZ(5)
-    box1.setMaterial(greenMaterial)
-    box1.getBoundsInParent
-
     //Leitura do ficheiro de configuração
     val listaShapes = IO_Utils.readFromFile(params.getRaw.get(0))
 
-
     // 3D objects (group of nodes - javafx.scene.Node) that will be provide to the subScene
-    val worldRoot:Group = new Group(wiredBox, camVolume, lineX, lineY, lineZ, cylinder1, box1)
+    val worldRoot:Group = new Group(wiredBox, camVolume, lineX, lineY, lineZ, cylinder1)
 
     //Adicionar shapes à scene
     (listaShapes foldRight ()) ((h, t) => {
@@ -156,58 +146,6 @@ class Main extends Application {
     stage.setScene(scene)
     stage.show
 
-    //example of bounding boxes (corresponding to the octree oct1) added manually to the world
-    val b2 = new Box(8.0,8.0,8.0)
-    //translate because it is added by default to the coords (0,0,0)
-    b2.setTranslateX(8/2)
-    b2.setTranslateY(8/2)
-    b2.setTranslateZ(8/2)
-    b2.setMaterial(redMaterial)
-    b2.setDrawMode(DrawMode.LINE)
-
-    val b3 = new Box(4,4,4)
-    //translate because it is added by default to the coords (0,0,0)
-    b3.setTranslateX(4/2)
-    b3.setTranslateY(4/2)
-    b3.setTranslateZ(4/2)
-    b3.setMaterial(redMaterial)
-    b3.setDrawMode(DrawMode.LINE)
-
-    //oct1 - example of an Octree[Placement] that contains only one Node (i.e. cylinder1)
-    //In case of difficulties to implement task T2 this octree can be used as input for tasks T3, T4 and T5
-
-    val placement1: Placement = ((0, 0, 0), 8.0)
-    val sec1: Section = (((0.0,0.0,0.0), 4.0), List(cylinder1.asInstanceOf[Node], b2.asInstanceOf[Node], b3.asInstanceOf[Node]))
-    val ocLeaf1 = OcLeaf(sec1)
-    var oct1:Octree[Placement] = OcNode[Placement](placement1, ocLeaf1, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
-
-    oct1 = scaleOctree(2, oct1)
-
-    //example of bounding boxes (corresponding to the octree oct1) added manually to the world
-    //val b2 = new Box(8,8,8)
-    //translate because it is added by default to the coords (0,0,0)
-    //b2.setTranslateX(8/2)
-    //b2.setTranslateY(8/2)
-    //b2.setTranslateZ(8/2)
-    //b2.setMaterial(redMaterial)
-    //if(camVolume.asInstanceOf[Shape3D].getBoundsInParent.intersects(b2.getBoundsInParent))
-      //b2.setMaterial(greenMaterial)
-    //b2.setDrawMode(DrawMode.LINE)
-
-    //val b3 = new Box(4,4,4)
-    //translate because it is added by default to the coords (0,0,0)
-    //b3.setTranslateX(4/2)
-    //b3.setTranslateY(4/2)
-    //b3.setTranslateZ(4/2)
-    //b3.setMaterial(redMaterial)
-    //if(camVolume.asInstanceOf[Shape3D].getBoundsInParent.intersects(b3.getBoundsInParent))
-      //b3.setMaterial(greenMaterial)
-    //b3.setDrawMode(DrawMode.LINE)
-
-
-    //adding boxes b2 and b3 to the world
-//    worldRoot.getChildren.add(b2)
-//    worldRoot.getChildren.add(b3)
 val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32))
 
     //Permite mover a camera com as arrow keys

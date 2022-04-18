@@ -63,7 +63,7 @@ object OcNode {
   def checkInBounds (fact: Double, oct: Octree[Placement]): Boolean = {
 
     val root = oct.asInstanceOf[OcNode[Placement]]
-    
+
 
     val list_Ocnodes = createAttributesList(root)
 

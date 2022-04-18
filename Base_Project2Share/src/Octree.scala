@@ -1,7 +1,7 @@
 import OcNode.Placement
 import Octree.Section
 import javafx.scene.{Group, Node}
-import javafx.scene.shape.{Box, Cylinder, DrawMode, Shape3D}
+import javafx.scene.shape.{Box, DrawMode, Shape3D}
 import javafx.scene.paint.{Color, PhongMaterial}
 
 sealed trait Octree[+A]

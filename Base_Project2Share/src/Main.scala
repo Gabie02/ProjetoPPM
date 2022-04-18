@@ -1,19 +1,17 @@
-import OcNode.{auxScale, mapColourEffect, scaleOctree}
-import Octree.{Placement, Section}
+import OcNode.{auxScale, mapColourEffect}
 import javafx.application.Application
 import javafx.geometry.Insets
 import javafx.scene.paint.PhongMaterial
 import javafx.scene.shape._
-import javafx.scene.transform.{Rotate, Translate}
+import javafx.scene.transform.{Rotate}
 import javafx.scene.{Group, Node}
 import javafx.stage.Stage
 import javafx.geometry.Pos
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import javafx.scene.{PerspectiveCamera, Scene, SceneAntialiasing, SubScene}
-import javafx.scene.input.{KeyCode, ScrollEvent}
+import javafx.scene.input.{KeyCode}
 
-import scala.runtime.Nothing$
 
 class Main extends Application {
 

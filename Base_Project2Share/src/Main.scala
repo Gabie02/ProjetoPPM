@@ -232,6 +232,7 @@ val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32
     }
     })
     intersectsCamera(oct2, camVolume)
+    scaleOctree(0.5, oct2)
 //    mapColourEffect(x => OcNode.greenRemove(x))(oct2)
   }
 
@@ -239,7 +240,7 @@ val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32
     oct match {
       // Se for um ocNode
       case _: OcNode[Placement] =>
-        println("ISTO É UM NODE")
+        //println("ISTO É UM NODE")
         val ocnode = oct.asInstanceOf[OcNode[Placement]]
         intersectsCamera(ocnode.up_00, camVolume)
         intersectsCamera(ocnode.up_01, camVolume)
@@ -253,7 +254,7 @@ val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32
 
         // Se for uma ocLeaf
       case _: OcLeaf[Placement, Section] =>
-        println("ISTO É UMA LEAF")
+        //println("ISTO É UMA LEAF")
           val ocleaf = oct.asInstanceOf[OcLeaf[Placement, Section]]
           val listaSection = ocleaf.section._2
           // Se a lista de nodes da section nao estiver vazia
@@ -280,7 +281,7 @@ val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32
           }
 
       case _ =>
-        println("ISTO É EMPTY")
+        //println("ISTO É EMPTY")
     }
   }
 

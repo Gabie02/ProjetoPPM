@@ -50,52 +50,136 @@ object OcNode {
   }
 
   def scaleOctree(fact: Double, oct: Octree[Placement]): Octree[Placement]  = fact match {
-    case 0.5| 2  => auxScale(fact,oct: Octree[Placement])
+    case 0.5| 2  =>
+      if(checkInBounds(fact,oct)) {
+        auxScale(fact, oct, oct)
+      } else {
+        oct
+      }
     case _ => println("--> Fator inválido!!!"); throw new IllegalArgumentException ("Argumento inválido: Não foi possível efetuar scale, factor inválido ")
   }
 
-  def auxScale (fact: Double, oct: Octree[Placement]): Octree[Placement] = {
+
+  def checkInBounds (fact: Double, oct: Octree[Placement]): Boolean = {
 
     val root = oct.asInstanceOf[OcNode[Placement]]
-//    println("Root before: " + root)
+    //    println("Root before: " + root)
 
     val list_Ocnodes = createAttributesList(root)
-    println("Lista list_Ocnodes: " + list_Ocnodes)
+    //println("Lista list_Ocnodes: " + list_Ocnodes)
 
-    val wiredBox = createWiredBox(root.placement._1, 32)
+    val wiredBox = createWiredBox((16,16,16), 32)
 
     list_Ocnodes.foldRight()((h, t) => {
 
       if (h.isInstanceOf[OcNode[Placement]]) {
-        scaleOctree(fact, h)
+        checkInBounds(fact, h)
       }
       if (h.isInstanceOf[OcLeaf[Placement, Section]]) {
         val shapeList = h.asInstanceOf[OcLeaf[Placement, Section]].section._2
         (shapeList foldRight List[Node]()) ((h, t) => {
-
-//          println("Shape before: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
+          var copia: Shape3D = null
           val originalX = h.getScaleX
           val originalY = h.getScaleY
           val originalZ = h.getScaleZ
-          h.setScaleX(originalX * fact)
-          h.setScaleY(originalY * fact)
-          h.setScaleZ(originalZ * fact)
 
-          if (wiredBox.getBoundsInParent.contains(h.getBoundsInParent)){
-//            println("Shape after: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
-            h :: t
+          //          println("Shape before: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
+          if (h.isInstanceOf[Box]) {
+            val box = h.asInstanceOf[Box]
+            copia = new Box(box.getWidth, box.getHeight, box.getDepth)
+
+            copia.setScaleX(originalX * fact)
+            copia.setScaleY(originalY * fact)
+            copia.setScaleZ(originalZ * fact)
+
+          }
+
+          if (h.isInstanceOf[Cylinder]) {
+            val cylinder = h.asInstanceOf[Cylinder]
+            copia = new Cylinder(cylinder.getRadius, cylinder.getHeight, cylinder.getDivisions)
+
+            copia.setScaleX(originalX * fact)
+            copia.setScaleY(originalY * fact)
+            copia.setScaleZ(originalZ * fact)
+
+
+          }
+
+          if (wiredBox.getBoundsInParent.contains(copia.getBoundsInParent)){
+            println("DENTRO")
+            t
           }
           else {
-            println("Shape fora dos limites")
-            h.setScaleX(originalX)
-            h.setScaleY(originalY)
-            h.setScaleZ(originalZ)
-            t
+            println("Shape fora dos limites, operação de scale cancelada")
+            return false
           }
         })
       }
     })
-//    println("Root after: " + root)
+    //    println("Root after: " + root)
+    true
+  }
+
+  def auxScale (fact: Double, oct: Octree[Placement], originalOct: Octree[Placement]): Octree[Placement] = {
+
+    val root = oct.asInstanceOf[OcNode[Placement]]
+    //    println("Root before: " + root)
+
+    val list_Ocnodes = createAttributesList(root)
+    //println("Lista list_Ocnodes: " + list_Ocnodes)
+
+    val wiredBox = createWiredBox((16,16,16), 45)
+
+    list_Ocnodes.foldRight()((h, t) => {
+
+      if (h.isInstanceOf[OcNode[Placement]]) {
+        auxScale(fact, h, originalOct)
+      }
+      if (h.isInstanceOf[OcLeaf[Placement, Section]]) {
+        val shapeList = h.asInstanceOf[OcLeaf[Placement, Section]].section._2
+        (shapeList foldRight List[Node]()) ((h, t) => {
+//          var copia: Shape3D = null
+          val originalX = h.getScaleX
+          val originalY = h.getScaleY
+          val originalZ = h.getScaleZ
+
+          //          println("Shape before: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
+//          if (h.isInstanceOf[Box]) {
+//            val box = h.asInstanceOf[Box]
+//            copia = new Box(box.getWidth, box.getHeight, box.getDepth)
+
+//            copia.setScaleX(originalX * fact)
+//            copia.setScaleY(originalY * fact)
+//            copia.setScaleZ(originalZ * fact)
+
+//          }
+
+//          if (h.isInstanceOf[Cylinder]) {
+//            val cylinder = h.asInstanceOf[Cylinder]
+//            copia = new Cylinder(cylinder.getRadius, cylinder.getHeight, cylinder.getDivisions)
+
+//            copia.setScaleX(originalX * fact)
+//            copia.setScaleY(originalY * fact)
+//            copia.setScaleZ(originalZ * fact)
+
+
+//          }
+
+          //if (wiredBox.getBoundsInParent.contains(copia.getBoundsInParent)){
+          println("Shape after: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
+          h.setScaleX(originalX * fact)
+          h.setScaleY(originalY * fact)
+          h.setScaleZ(originalZ * fact)
+          t
+          //}
+          //else {
+          //  println("Shape fora dos limites, operação de scale cancelada")
+          //  return originalOct
+          //}
+        })
+      }
+    })
+    //    println("Root after: " + root)
     root
   }
 
@@ -149,6 +233,7 @@ object OcNode {
     box.setDrawMode(DrawMode.LINE)
     box
   }
+
 
   /*
   * Está em falta a implementação do algoritmo de otimização que trata dos conflitos entre

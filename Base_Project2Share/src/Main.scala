@@ -1,16 +1,16 @@
-import OcNode.{auxScale, mapColourEffect}
+import OcNode.{auxScale, mapColourEffect, scaleOctree}
 import javafx.application.Application
 import javafx.geometry.Insets
 import javafx.scene.paint.PhongMaterial
 import javafx.scene.shape._
-import javafx.scene.transform.{Rotate}
+import javafx.scene.transform.Rotate
 import javafx.scene.{Group, Node}
 import javafx.stage.Stage
 import javafx.geometry.Pos
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import javafx.scene.{PerspectiveCamera, Scene, SceneAntialiasing, SubScene}
-import javafx.scene.input.{KeyCode}
+import javafx.scene.input.KeyCode
 
 
 class Main extends Application {
@@ -170,7 +170,7 @@ val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32
     }
     })
     intersectsCamera(oct2, camVolume)
-    scaleOctree(0.5, oct2)
+    scaleOctree(2, oct2)
 //    mapColourEffect(x => OcNode.greenRemove(x))(oct2)
   }
 

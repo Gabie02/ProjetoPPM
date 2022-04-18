@@ -313,7 +313,6 @@ val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32
         intersectsCamera(ocnode.down_10, camVolume)
         intersectsCamera(ocnode.down_11, camVolume)
 
-
         // Se for uma ocLeaf
       case _: OcLeaf[Placement, Section] =>
         println("ISTO É UMA LEAF")

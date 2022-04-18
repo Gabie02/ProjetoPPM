@@ -120,7 +120,7 @@ object OcNode {
   }
 
   def createCorners(placement: Placement):List[Point] = {
-    val point = placement._1 // A root n vai ser sempre o quadrado vermelho grande?
+    val point = placement._1
     val size = placement._2
     val newPoint = new Point(point._1 - size/2,point._2 - size/2,point._3 - size/2)
     List():+addTwoPoints(newPoint, (size/4,size/4,size/4)):+addTwoPoints(newPoint, (size/4,size/4,size/4 + size/2)):+
@@ -152,103 +152,115 @@ object OcNode {
     box
   }
 
-  def createTree(worldRoot:Group,shapeList: List[Shape3D],root: Placement):Octree[Placement] = {
-    val size = root._2
-    val emptyOcNode = new OcNode[Placement](((0.0,0.0,0.0),size/2),OcEmpty,OcEmpty,OcEmpty,OcEmpty,OcEmpty,OcEmpty,OcEmpty,OcEmpty)
-    val corners = createCorners(root)
-
-    //Para cada partição ver se se existe alguma figura que esteja contida na mesma
-    def iterateThroughCorners(finalTree: Octree[Placement],corners:List[Point],i:Int,stop:Int):Octree[Placement] = {
-      if(i > stop)
-        return finalTree
-      val partition =createWiredBox(corners(i),size/2)
-            println(s"Partiçao para o canto ${corners(i)} com tamanho ${size/2}")
-      (shapeList foldRight List[Shape3D]()) ((h,t) =>{
-
-        if(partition.getBoundsInParent.contains(h.getBoundsInParent)) {
-          //Se puder ser dividida em ainda mais partições, criar um node, que representa um novo ramo
-          if (canBeDivided((corners(i),size / 2),h)) {
-                        println(s"A partição pode ser dividida para o shape $h. Fazer uma nova tree")
-            iterateThroughCorners(createTree(worldRoot,shapeList,(corners(i),size / 2)).asInstanceOf[OcNode[Placement]],
-              corners,i+1,stop)
-            //Se não puder ser dividida
-            //Se nessa partição já existir uma leaf, adicionar o novo objeto à leaf
-          } else if(finalTree.asInstanceOf[OcNode[Placement]].productElement(i).isInstanceOf[OcLeaf[Placement,Section]]) {
-                        println(s"A partição NÃO PODE ser dividida para o shape $h. Ver se já existe uma leaf")
-            val list = finalTree.asInstanceOf[OcNode[Placement]].productElement(i).asInstanceOf[OcLeaf[Placement,Section]].section._2
-            worldRoot.getChildren.add(partition)
-            //retorna uma nova árvore com a lista atualizada e o elemento, mais a partição, no seu sitio
-            iterateThroughCorners(putElementAt(finalTree,new OcLeaf[Placement,Section]((corners(i),size/2),list:+h:+partition),i).asInstanceOf[OcNode[Placement]],
-              corners,i+1,stop)
-
-            //Se não existir uma leaf ainda, fazer uma nova
-          } else {
-                        println(s"A partição NÃO PODE ser dividida para o shape $h. Fazer uma nova leaf")
-            worldRoot.getChildren.add(partition)
-            //retorna uma nova árvore com a lista com o elemento e a partição no seu sitio
-            iterateThroughCorners(putElementAt(finalTree,new OcLeaf[Placement,Section]((corners(i),size/2),List(h,partition)),i).asInstanceOf[OcNode[Placement]],
-              corners,i+1,stop)
-          }
-
-        }
-                println("Ver o próximo Shape")
-        //Repetir o processo com o seguinte shape
-        t
-
-      })
-
-      iterateThroughCorners(finalTree,corners,i+1,stop)
-
-    }
-
-    iterateThroughCorners(emptyOcNode,corners,0,corners.size - 1)
-  }
-
-//  def createTree(worldRoot:Group, shapeList: List[Shape3D], root: Placement):Octree[Placement] = {
-//    val point = root._1 // A root n vai ser sempre o quadrado vermelho grande?
+//  def createTree(worldRoot:Group,shapeList: List[Shape3D],root: Placement):Octree[Placement] = {
 //    val size = root._2
-//    val emptyOcNode = new OcNode[Placement](((0.0,0.0,0.0), size/2), OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
+//    val emptyOcNode = new OcNode[Placement](((0.0,0.0,0.0),size/2),OcEmpty,OcEmpty,OcEmpty,OcEmpty,OcEmpty,OcEmpty,OcEmpty,OcEmpty)
 //    val corners = createCorners(root)
-//    var finalTree = emptyOcNode
+//
 //    //Para cada partição ver se se existe alguma figura que esteja contida na mesma
-//    def iterateThroughCorners(corners:List[Point],i:Int,stop:Int):Unit= {
-//      val partition = createWiredBox(corners(i),size/2)
-//      //      println(s"Partiçao para o canto ${corners(i)} com tamanho ${size/2}")
+//    def iterateThroughCorners(finalTree: Octree[Placement],corners:List[Point],i:Int,stop:Int):Octree[Placement] = {
+//      println(s"ITERAÇÃO : $i \n TREE ---")
+//      for(a <- 0 to finalTree.asInstanceOf[OcNode[Placement]].productArity - 1)
+//        println(s"${finalTree.asInstanceOf[OcNode[Placement]].productElementName(a)} ------> ${finalTree.asInstanceOf[OcNode[Placement]].productElement(a)}")
+//      if(i >= stop) {
+//        println("--- STOP ---")
+//        return finalTree
+//      }
+//      val partition =createWiredBox(corners(i),size/2)
+//            println(s"Partiçao para o canto ${corners(i)} com tamanho ${size/2}")
 //      (shapeList foldRight List[Shape3D]()) ((h,t) =>{
+//
 //        if(partition.getBoundsInParent.contains(h.getBoundsInParent)) {
+//          println(s"A partição contem o shape $h")
 //          //Se puder ser dividida em ainda mais partições, criar um node, que representa um novo ramo
 //          if (canBeDivided((corners(i),size / 2),h)) {
-//            //            println(s"A partição pode ser dividida para o shape $h. Fazer uma nova tree")
-//            finalTree = createTree(worldRoot,shapeList,(corners(i),size / 2)).asInstanceOf[OcNode[Placement]]
+//                        println(s"A partição pode ser dividida para o shape $h. Fazer uma nova tree")
+////            val node = createTree(worldRoot,shapeList,(corners(i),size / 2)).asInstanceOf[OcNode[Placement]]
+//            val newTree = createTree(worldRoot,shapeList,(corners(i),size / 2)).asInstanceOf[OcNode[Placement]]
+//            val node = putElementAt(finalTree, newTree, i)
+//            println(s"NODE -> $node")
+//            iterateThroughCorners(node, corners,i+1,stop)
 //            //Se não puder ser dividida
 //            //Se nessa partição já existir uma leaf, adicionar o novo objeto à leaf
-//          } else if(finalTree.productElement(i).isInstanceOf[OcLeaf[Placement,Section]]) {
-//            //            println(s"A partição NÃO PODE ser dividida para o shape $h. Ver se já existe uma leaf")
-//            val list = finalTree.productElement(i).asInstanceOf[OcLeaf[Placement,Section]].section._2
+//          } else if(finalTree.asInstanceOf[OcNode[Placement]].productElement(i).isInstanceOf[OcLeaf[Placement,Section]]) {
+//                        println(s"A partição NÃO PODE ser dividida para o shape $h. Ver se já existe uma leaf")
+//            val list = finalTree.asInstanceOf[OcNode[Placement]].productElement(i).asInstanceOf[OcLeaf[Placement,Section]].section._2
 //            worldRoot.getChildren.add(partition)
 //            //retorna uma nova árvore com a lista atualizada e o elemento, mais a partição, no seu sitio
-//            finalTree = putElementAt(finalTree,new OcLeaf[Placement,Section]((corners(i),size/2),list:+h:+partition),i).asInstanceOf[OcNode[Placement]]
+//            val leaf = putElementAt(finalTree,new OcLeaf[Placement,Section]((corners(i),size/2),list:+h:+partition),i)
+//            println(s"LEAF -> $leaf")
+//            iterateThroughCorners(leaf, corners,i+1,stop)
 //
 //            //Se não existir uma leaf ainda, fazer uma nova
 //          } else {
-//            //            println(s"A partição NÃO PODE ser dividida para o shape $h. Fazer uma nova leaf")
+//                        println(s"A partição NÃO PODE ser dividida para o shape $h. Fazer uma nova leaf")
 //            worldRoot.getChildren.add(partition)
 //            //retorna uma nova árvore com a lista com o elemento e a partição no seu sitio
-//            finalTree = putElementAt(finalTree,new OcLeaf[Placement,Section]((corners(i),size/2),List(h,partition)),i).asInstanceOf[OcNode[Placement]]
+//            val leaf = putElementAt(finalTree,new OcLeaf[Placement,Section]((corners(i),size/2),List(h,partition)),i)
+//            println(s"LEAF -> $leaf")
+//            iterateThroughCorners(leaf, corners,i+1,stop)
 //          }
 //
 //        }
-//        //        println("Ver o próximo Shape")
+//                println("Ver o próximo Shape")
 //        //Repetir o processo com o seguinte shape
 //        t
 //
 //      })
-//      if(i < stop)
-//        iterateThroughCorners(corners,i+1,stop)
+//
+//      iterateThroughCorners(finalTree,corners,i+1,stop)
+//
 //    }
-//    iterateThroughCorners(corners, 0, corners.size - 1)
-//    finalTree
+//
+//    iterateThroughCorners(emptyOcNode,corners,0,corners.size - 1)
 //  }
+
+  def createTree(worldRoot:Group, shapeList: List[Shape3D], root: Placement):Octree[Placement] = {
+    val point = root._1 // A root n vai ser sempre o quadrado vermelho grande?
+    val size = root._2
+    val emptyOcNode = new OcNode[Placement](((0.0,0.0,0.0), size/2), OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
+    val corners = createCorners(root)
+    var finalTree = emptyOcNode
+    //Para cada partição ver se se existe alguma figura que esteja contida na mesma
+    def iterateThroughCorners(corners:List[Point],i:Int,stop:Int):Unit= {
+      val partition = createWiredBox(corners(i),size/2)
+      //      println(s"Partiçao para o canto ${corners(i)} com tamanho ${size/2}")
+      (shapeList foldRight List[Shape3D]()) ((h,t) =>{
+        if(partition.getBoundsInParent.contains(h.getBoundsInParent)) {
+          //Se puder ser dividida em ainda mais partições, criar um node, que representa um novo ramo
+          if (canBeDivided((corners(i),size / 2),h)) {
+            //            println(s"A partição pode ser dividida para o shape $h. Fazer uma nova tree")
+            val node = createTree(worldRoot,shapeList,(corners(i),size / 2))
+            finalTree = putElementAt(finalTree, node,i).asInstanceOf[OcNode[Placement]]
+            //Se não puder ser dividida
+            //Se nessa partição já existir uma leaf, adicionar o novo objeto à leaf
+          } else if(finalTree.productElement(i).isInstanceOf[OcLeaf[Placement,Section]]) {
+            //            println(s"A partição NÃO PODE ser dividida para o shape $h. Ver se já existe uma leaf")
+            val list = finalTree.productElement(i).asInstanceOf[OcLeaf[Placement,Section]].section._2
+            worldRoot.getChildren.add(partition)
+            //retorna uma nova árvore com a lista atualizada e o elemento, mais a partição, no seu sitio
+            finalTree = putElementAt(finalTree,new OcLeaf[Placement,Section]((corners(i),size/2),list:+h:+partition),i).asInstanceOf[OcNode[Placement]]
+
+            //Se não existir uma leaf ainda, fazer uma nova
+          } else {
+            //            println(s"A partição NÃO PODE ser dividida para o shape $h. Fazer uma nova leaf")
+            worldRoot.getChildren.add(partition)
+            //retorna uma nova árvore com a lista com o elemento e a partição no seu sitio
+            finalTree = putElementAt(finalTree,new OcLeaf[Placement,Section]((corners(i),size/2),List(h,partition)),i).asInstanceOf[OcNode[Placement]]
+          }
+
+        }
+        //        println("Ver o próximo Shape")
+        //Repetir o processo com o seguinte shape
+        t
+
+      })
+      if(i < stop)
+        iterateThroughCorners(corners,i+1,stop)
+    }
+    iterateThroughCorners(corners, 0, corners.size - 1)
+    finalTree
+  }
 
   def sepiaEffect(c:Color):Color = {
     val r = c.getRed * 255

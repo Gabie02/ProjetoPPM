@@ -45,7 +45,7 @@ object OcNode {
   type Point = (Double, Double, Double)
   type Size = Double
   type Placement = (Point, Size) //1st point: origin, 2nd point: size
-  def addTwoPoints(p1:Point, p2:Point) = {
+  def addTwoPoints(p1:Point, p2:Point):Point = {
     (p1._1 + p2._1, p1._2 + p2._2, p1._3 + p2._3)
   }
 
@@ -150,6 +150,10 @@ object OcNode {
     box
   }
 
+  /*
+  * Está em falta a implementação do algoritmo de otimização que trata dos conflitos entre
+  * diferentes partições para a mesma shape, em que o mesmo devia ia para a partição "ascendente".
+  * */
   def createTree(worldRoot:Group, shapeList: List[Shape3D], root: Placement):Octree[Placement] = {
     val size = root._2
     val emptyOcNode = new OcNode[Placement](((0.0,0.0,0.0), size/2), OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
@@ -161,8 +165,8 @@ object OcNode {
 
       val partition = createWiredBox(corners(i),size/2)
 
-      (shapeList foldRight List[Shape3D]()) ((h,t) =>{
-        
+      (shapeList foldRight List[Shape3D]()) ((h,t) => {
+
         if(partition.getBoundsInParent.contains(h.getBoundsInParent)) {
 
           //Se puder ser dividida em ainda mais partições, criar um node, que representa um novo ramo

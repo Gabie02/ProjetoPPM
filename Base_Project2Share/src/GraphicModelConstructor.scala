@@ -6,7 +6,7 @@ import scala.util.{Failure, Success, Try}
 
 case class GraphicModelConstructor() {
 
-  def buildObject(obj: String): Shape3D = {GraphicModelConstructor.buildObject(obj).get}
+  def buildObject(line: String): Shape3D = {GraphicModelConstructor.buildObject(line).get}
 
 }
 

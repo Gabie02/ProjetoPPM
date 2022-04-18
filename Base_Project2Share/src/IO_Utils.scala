@@ -11,7 +11,6 @@ object IO_Utils {
     val dir = System.getProperty("user.dir")
     val bufferedSource = Source.fromFile(s"$dir/$file")
     for (line <- bufferedSource.getLines){
-      println(line.toUpperCase)
       shapes += convertShapes(line)
 
     }

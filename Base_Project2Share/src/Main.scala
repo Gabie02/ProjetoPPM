@@ -87,11 +87,8 @@ class Main extends Application {
     box1.getBoundsInParent
 
     //Leitura do ficheiro de configuração
-    println("Introduza o nome do ficheiro: ")
-//    val file = scala.io.StdIn.readLine()
-    val listaShapes = IO_Utils.readFromFile("conf.txt")
-    //listaShapes.foreach(e => println(e))
-//    println(listaShapes)
+    val listaShapes = IO_Utils.readFromFile(params.getRaw.get(0))
+
 
     // 3D objects (group of nodes - javafx.scene.Node) that will be provide to the subScene
     val worldRoot:Group = new Group(wiredBox, camVolume, lineX, lineY, lineZ, cylinder1, box1)
@@ -208,65 +205,6 @@ class Main extends Application {
     //b3.setDrawMode(DrawMode.LINE)
 
 
-    val teste1 = new Box(16.0,16.0,16.0)
-    teste1.setTranslateX(8)
-    teste1.setTranslateY(8)
-    teste1.setTranslateZ(8)
-    teste1.setMaterial(redMaterial)
-    teste1.setDrawMode(DrawMode.LINE)
-    val teste2 = new Box(8.0,8.0,8.0)
-    teste2.setTranslateX(8)
-    teste2.setTranslateY(0)
-    teste2.setTranslateZ(24)
-    teste2.setMaterial(redMaterial)
-    teste2.setDrawMode(DrawMode.LINE)
-    val teste3 = new Box(8.0,8.0,8.0)
-    teste3.setTranslateX(0)
-    teste3.setTranslateY(8)
-    teste3.setTranslateZ(24)
-    teste3.setMaterial(redMaterial)
-    teste3.setDrawMode(DrawMode.LINE)
-    val teste4 = new Box(8.0,8.0,8.0)
-    teste4.setTranslateX(0)
-    teste4.setTranslateY(0)
-    teste4.setTranslateZ(24)
-    teste4.setMaterial(redMaterial)
-    teste4.setDrawMode(DrawMode.LINE)
-
-    val teste11 = new Box(8.0,8.0,8.0)
-    teste11.setTranslateX(8)
-    teste11.setTranslateY(8)
-    teste11.setTranslateZ(16)
-    teste11.setMaterial(redMaterial)
-    teste11.setDrawMode(DrawMode.LINE)
-    val teste22 = new Box(8.0,8.0,8.0)
-    teste22.setTranslateX(8)
-    teste22.setTranslateY(0)
-    teste22.setTranslateZ(16)
-    teste22.setMaterial(redMaterial)
-    teste22.setDrawMode(DrawMode.LINE)
-    val teste33 = new Box(8.0,8.0,8.0)
-    teste33.setTranslateX(0)
-    teste33.setTranslateY(8)
-    teste33.setTranslateZ(16)
-    teste33.setMaterial(redMaterial)
-    teste33.setDrawMode(DrawMode.LINE)
-    val teste44 = new Box(8.0,8.0,8.0)
-    teste44.setTranslateX(0)
-    teste44.setTranslateY(0)
-    teste44.setTranslateZ(16)
-    teste44.setMaterial(redMaterial)
-    teste44.setDrawMode(DrawMode.LINE)
-
-    //worldRoot.getChildren.add(teste1)
-    //worldRoot.getChildren.add(teste2)
-    //worldRoot.getChildren.add(teste3)
-    //worldRoot.getChildren.add(teste4)
-    //worldRoot.getChildren.add(teste11)
-    //worldRoot.getChildren.add(teste22)
-    //worldRoot.getChildren.add(teste33)
-    //worldRoot.getChildren.add(teste44)
-
     //adding boxes b2 and b3 to the world
 //    worldRoot.getChildren.add(b2)
 //    worldRoot.getChildren.add(b3)
@@ -293,7 +231,6 @@ val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32
       case _ =>
     }
     })
-    //val oct2 = OcNode.createTree2(worldRoot, listaShapes.toList,((0.0,0.0,0.0), 32))
     intersectsCamera(oct2, camVolume)
 //    mapColourEffect(x => OcNode.greenRemove(x))(oct2)
   }
@@ -312,6 +249,7 @@ val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32
         intersectsCamera(ocnode.down_01, camVolume)
         intersectsCamera(ocnode.down_10, camVolume)
         intersectsCamera(ocnode.down_11, camVolume)
+
 
         // Se for uma ocLeaf
       case _: OcLeaf[Placement, Section] =>
@@ -360,11 +298,6 @@ val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32
 object FxApp {
 
   def main(args: Array[String]): Unit = {
-    //------- Area de Testes -------
-//    IO_Utils.readFromFile(s"$args")
-    //println("Partition: " + partitionId(root).toString())
-
-    //------------------------------
     Application.launch(classOf[Main], args: _*)
 
   }

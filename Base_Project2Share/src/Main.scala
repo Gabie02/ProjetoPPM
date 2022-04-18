@@ -77,6 +77,7 @@ class Main extends Application {
     cylinder1.setScaleZ(2)
     cylinder1.setMaterial(greenMaterial)
 
+    //  --- T1 ---
     //Leitura do ficheiro de configuração
     val listaShapes = IO_Utils.readFromFile(params.getRaw.get(0))
 
@@ -173,7 +174,7 @@ val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32
 //    scaleOctree(2, oct2)
 //    mapColourEffect(x => OcNode.greenRemove(x))(oct2)
   }
-
+  //  --- T3 ---
   def intersectsCamera(oct:Octree[Placement], camVolume: Cylinder):Unit = {
     oct match {
       // Se for um ocNode

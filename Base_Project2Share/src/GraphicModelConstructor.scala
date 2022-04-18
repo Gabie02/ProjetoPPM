@@ -39,7 +39,7 @@ object GraphicModelConstructor {
     }
   }
 
-  private def createShape(shape:String, color:Color, translate: Translate, scale: Scale): Shape3D = {
+  def createShape(shape:String, color:Color, translate: Translate, scale: Scale): Shape3D = {
     def setShapes(s:Shape3D, color:Color, translate: Translate, scale: Scale):Shape3D = {
       println(s"Box: ${s.toString}")
       s.setTranslateX(translate._1)

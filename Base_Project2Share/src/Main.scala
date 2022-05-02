@@ -1,4 +1,3 @@
-import OcNode.{auxScale, mapColourEffect, scaleOctree}
 import javafx.application.Application
 import javafx.geometry.Insets
 import javafx.scene.paint.PhongMaterial
@@ -53,11 +52,11 @@ class Main extends Application {
 
     val lineZ = new Line(0, 0, 200, 0)
     lineZ.setStroke(Color.LIGHTSALMON)
-    lineZ.getTransforms().add(new Rotate(-90, 0, 0, 0, Rotate.Y_AXIS))
+    lineZ.getTransforms.add(new Rotate(-90, 0, 0, 0, Rotate.Y_AXIS))
 
     val camVolume = new Cylinder(10, 50, 10)
     camVolume.setTranslateX(1)
-    camVolume.getTransforms().add(new Rotate(45, 0, 0, 0, Rotate.X_AXIS))
+    camVolume.getTransforms.add(new Rotate(45, 0, 0, 0, Rotate.X_AXIS))
     camVolume.setMaterial(blueMaterial)
     camVolume.setDrawMode(DrawMode.LINE)
 
@@ -120,7 +119,7 @@ class Main extends Application {
     cameraView.getT.setZ(-100)
     cameraView.getT.setY(-500)
     cameraView.getCamera.setTranslateZ(-50)
-    cameraView.startViewing
+    cameraView.startViewing()
 
       // Position of the CameraView: Right-bottom corner
       StackPane.setAlignment(cameraView, Pos.BOTTOM_RIGHT)
@@ -135,7 +134,7 @@ class Main extends Application {
 
     scene.setOnScroll(event => {
       var zoomfactor = 1.05
-      if(event.getDeltaY() < 0)
+      if(event.getDeltaY < 0)
         zoomfactor = 2 - zoomfactor
 
       cameraView.setScaleX(cameraView.getScaleX * zoomfactor)
@@ -145,12 +144,12 @@ class Main extends Application {
     //setup and start the Stage
     stage.setTitle("PPM Project 21/22")
     stage.setScene(scene)
-    stage.show
+    stage.show()
 
 val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32))
 
     //Permite mover a camera com as arrow keys
-    scene.setOnKeyPressed(event => { event.getCode() match {
+    scene.setOnKeyPressed(event => { event.getCode match {
       case KeyCode.UP =>
         camVolume.setTranslateY(camVolume.getTranslateY - 2)
         intersectsCamera(oct2,camVolume)

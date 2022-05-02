@@ -4,6 +4,8 @@ import javafx.scene.{Group, Node}
 import javafx.scene.shape.{Box, Cylinder, DrawMode, Shape3D}
 import javafx.scene.paint.{Color, PhongMaterial}
 
+import scala.annotation.tailrec
+
 sealed trait Octree[+A]
 
 case class OcNode[A](placement: A,
@@ -53,75 +55,71 @@ object OcNode {
 
   //  --- T4 ---
   def scaleOctree(fact: Double, oct: Octree[Placement]): Octree[Placement] = fact match {
-    case 0.5 | 2 =>
-      if (checkInBounds(fact, oct)) {
-        auxScale(fact, oct, oct)
-      } else {
-        oct
-      }
+    case 0.5 | 2 => auxScale(fact, oct, oct)
+
     case _ => println("--> Fator inválido!!!"); throw new IllegalArgumentException("Argumento inválido: Não foi possível efetuar scale, factor inválido ")
   }
 
 
-  def checkInBounds(fact: Double, oct: Octree[Placement]): Boolean = {
-
-    val root = oct.asInstanceOf[OcNode[Placement]]
-
-
-    val list_Ocnodes = createAttributesList(root)
-
-
-    val wiredBox = createWiredBox((16, 16, 16), 40)
-
-    list_Ocnodes.foldRight()((h, t) => {
-
-      if (h.isInstanceOf[OcNode[Placement]]) {
-        checkInBounds(fact, h)
-      }
-      if (h.isInstanceOf[OcLeaf[Placement, Section]]) {
-        val shapeList = h.asInstanceOf[OcLeaf[Placement, Section]].section._2
-        (shapeList foldRight List[Node]()) ((h, t) => {
-          var copia: Shape3D = null
-          val originalX = h.getScaleX
-          val originalY = h.getScaleY
-          val originalZ = h.getScaleZ
-
-
-          if (h.isInstanceOf[Box]) {
-            val box = h.asInstanceOf[Box]
-            copia = new Box(box.getWidth, box.getHeight, box.getDepth)
-
-            copia.setScaleX(originalX * fact)
-            copia.setScaleY(originalY * fact)
-            copia.setScaleZ(originalZ * fact)
-
-          }
-
-          if (h.isInstanceOf[Cylinder]) {
-            val cylinder = h.asInstanceOf[Cylinder]
-            copia = new Cylinder(cylinder.getRadius, cylinder.getHeight, cylinder.getDivisions)
-
-            copia.setScaleX(originalX * fact)
-            copia.setScaleY(originalY * fact)
-            copia.setScaleZ(originalZ * fact)
-
-
-          }
-
-          if (wiredBox.getBoundsInParent.contains(copia.getBoundsInParent)) {
-            println("DENTRO")
-            t
-          }
-          else {
-            println("Shape fora dos limites, operação de scale cancelada")
-            return false
-          }
-        })
-      }
-    })
-
-    true
-  }
+//  def checkInBounds(fact: Double, oct: Octree[Placement]): Boolean = {
+//
+//    val root = oct.asInstanceOf[OcNode[Placement]]
+//
+//
+//    val list_Ocnodes = createAttributesList(root)
+//
+//
+//    val wiredBox = createWiredBox((16, 16, 16), 40)
+//
+//    list_Ocnodes.foldRight()((h, t) => {
+//
+//      if (h.isInstanceOf[OcNode[Placement]]) {
+//        checkInBounds(fact, h)
+//      }
+//      if (h.isInstanceOf[OcLeaf[Placement, Section]]) {
+//        val shapeList = h.asInstanceOf[OcLeaf[Placement, Section]].section._2
+//        (shapeList foldRight List[Node]()) ((h, t) => {
+//          var copia: Shape3D = null
+//          val originalX = h.getScaleX
+//          val originalY = h.getScaleY
+//          val originalZ = h.getScaleZ
+//
+//
+//          if (h.isInstanceOf[Box]) {
+//            val box = h.asInstanceOf[Box]
+//            copia = new Box(box.getWidth, box.getHeight, box.getDepth)
+//
+//            copia.setScaleX(originalX * fact)
+//            copia.setScaleY(originalY * fact)
+//            copia.setScaleZ(originalZ * fact)
+//
+//          }
+//
+//          if (h.isInstanceOf[Cylinder]) {
+//            val cylinder = h.asInstanceOf[Cylinder]
+//            copia = new Cylinder(cylinder.getRadius, cylinder.getHeight, cylinder.getDivisions)
+//
+//            copia.setScaleX(originalX * fact)
+//            copia.setScaleY(originalY * fact)
+//            copia.setScaleZ(originalZ * fact)
+//
+//
+//          }
+//
+//          if (wiredBox.getBoundsInParent.contains(copia.getBoundsInParent)) {
+//            println("DENTRO")
+//            t
+//          }
+//          else {
+//            println("Shape fora dos limites, operação de scale cancelada")
+//            return false
+//          }
+//        })
+//      }
+//    })
+//
+//    true
+//  }
 
   def auxScale(fact: Double, oct: Octree[Placement], originalOct: Octree[Placement]): Octree[Placement] = {
 
@@ -129,12 +127,12 @@ object OcNode {
 
     val list_Ocnodes = createAttributesList(root)
 
-    list_Ocnodes.foldRight()((h, t) => {
-
-      if (h.isInstanceOf[OcNode[Placement]]) {
+    list_Ocnodes.foldRight()((h, _) => {
+      h match {
+        case _: OcNode[Placement] =>
         auxScale(fact, h, originalOct)
-      }
-      if (h.isInstanceOf[OcLeaf[Placement, Section]]) {
+
+        case _: OcLeaf[Placement, Section] =>
         val shapeList = h.asInstanceOf[OcLeaf[Placement, Section]].section._2
         (shapeList foldRight List[Node]()) ((h, t) => {
           val originalX = h.getScaleX
@@ -149,13 +147,15 @@ object OcNode {
           t
 
         })
-      }
+        case _ =>
+    }
     })
 
     root
   }
 
   def createAttributesList(e: OcNode[Placement]): List[Octree[Placement]] = {
+    @tailrec
     def iterate(e: OcNode[Placement], l: List[Octree[Placement]], s: Int): List[Octree[Placement]] = {
       if (s == e.productArity) l else iterate(e, l :+ e.productElement(s).asInstanceOf[Octree[Placement]], s + 1)
     }
@@ -274,9 +274,9 @@ object OcNode {
     val g = c.getGreen * 255
     val b = c.getBlue * 255
     println(s"Cor: $c RGB: $r, $g, $b")
-    val newR = if (0.4 * r + 0.77 * g + 0.2 * b > 255.0) 255 else (0.4 * r + 0.77 * g + 0.2 * b)
-    val newG = if (0.35 * r + 0.69 * g + 0.17 * b > 255.0) 255 else (0.35 * r + 0.69 * g + 0.17 * b)
-    val newB = if (0.27 * r + 0.53 * g + 0.13 * b > 255.0) 255 else (0.27 * r + 0.53 * g + 0.13 * b)
+    val newR = if (0.4 * r + 0.77 * g + 0.2 * b > 255.0) 255 else 0.4 * r + 0.77 * g + 0.2 * b
+    val newG = if (0.35 * r + 0.69 * g + 0.17 * b > 255.0) 255 else 0.35 * r + 0.69 * g + 0.17 * b
+    val newB = if (0.27 * r + 0.53 * g + 0.13 * b > 255.0) 255 else 0.27 * r + 0.53 * g + 0.13 * b
     println(s"New RGB: $newR, $newG, $newB")
     Color.rgb(newR.toInt, newG.toInt, newB.toInt)
   }
@@ -289,26 +289,29 @@ object OcNode {
     val root = oct.asInstanceOf[OcNode[Placement]]
     val inputSize = root.productArity
 
+    @tailrec
     def iterate(root: OcNode[Placement], i: Int, stop: Int): Octree[Placement] = {
 
       val partition = root.productElement(i)
 
-      if (partition.isInstanceOf[OcNode[Placement]]) {
+      partition match {
+        case _: OcNode[Placement] =>
 
-        mapColourEffect(func)(partition.asInstanceOf[Octree[Placement]])
+          mapColourEffect(func)(partition.asInstanceOf[Octree[Placement]])
 
-      } else if (partition.isInstanceOf[OcLeaf[Placement, Section]]) {
+        case _: OcLeaf[Placement, Section] =>
 
-        val shapeList: List[Node] = partition.asInstanceOf[OcLeaf[Placement, Section]].section._2
-        (shapeList foldRight List[Node]()) ((h, t) => {
+          val shapeList: List[Node] = partition.asInstanceOf[OcLeaf[Placement, Section]].section._2
+          (shapeList foldRight List[Node]()) ((h, t) => {
 
-          val material = h.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial]
-          val color: Color = material.getDiffuseColor
-          material.setDiffuseColor(func(color));
-          t
+            val material = h.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial]
+            val color: Color = material.getDiffuseColor
+            material.setDiffuseColor(func(color))
+            t
 
-        })
+          })
 
+        case _ =>
       }
       if (i < stop) iterate(root, i + 1, stop) else root
     }
@@ -361,12 +364,12 @@ object OcNode {
         val color = ((difColor.getRed * 255.0).toInt, (difColor.getGreen * 255.0).toInt, (difColor.getBlue * 255.0).toInt)
         if (s.toString.contains("Cylinder")) {
           val newShape = GraphicModelConstructor.createShape("Cylinder", color, (x, y, z), (s.getScaleX, s.getScaleY, s.getScaleZ))
-          if (partition.getBoundsInParent.contains(newShape.getBoundsInParent)) worldRoot.getChildren.add(newShape);
+          if (partition.getBoundsInParent.contains(newShape.getBoundsInParent)) worldRoot.getChildren.add(newShape)
           return true
         }
         if (s.toString.contains("Box")) {
           val newShape = GraphicModelConstructor.createShape("Box", color, (x, y, z), (s.getScaleX, s.getScaleY, s.getScaleZ))
-          if (partition.getBoundsInParent.contains(newShape.getBoundsInParent)) worldRoot.getChildren.add(newShape);
+          if (partition.getBoundsInParent.contains(newShape.getBoundsInParent)) worldRoot.getChildren.add(newShape)
           return true
         }
       }

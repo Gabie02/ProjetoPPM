@@ -146,26 +146,22 @@ class Main extends Application {
     stage.setScene(scene)
     stage.show()
 
-val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32))
-
+    // Tree com centro em (16.0,16.0,16.0) e comprimento 32
+    val oct2 = OctreeUtils.createTree(worldRoot, listaShapes.toList, ((16.0,16.0,16.0), 32))
     //Permite mover a camera com as arrow keys
     scene.setOnKeyPressed(event => { event.getCode match {
       case KeyCode.UP =>
         camVolume.setTranslateY(camVolume.getTranslateY - 2)
         intersectsCamera2(oct2,camVolume)
-      //        worldRoot.getChildren.removeAll()
       case KeyCode.DOWN =>
         camVolume.setTranslateY(camVolume.getTranslateY + 2)
         intersectsCamera2(oct2,camVolume)
-      //        worldRoot.getChildren.removeAll()
       case KeyCode.LEFT =>
         camVolume.setTranslateX(camVolume.getTranslateX - 2)
         intersectsCamera2(oct2,camVolume)
-      //        worldRoot.getChildren.removeAll()
       case KeyCode.RIGHT =>
         camVolume.setTranslateX(camVolume.getTranslateX + 2)
         intersectsCamera2(oct2,camVolume)
-      //        worldRoot.getChildren.removeAll()
       case _ =>
     }
     })
@@ -227,7 +223,7 @@ val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32
       case _: OcNode[Placement] =>
         println("SOU UM NODE")
         val ocnode = oct.asInstanceOf[OcNode[Placement]]
-        val atribList = OcNode.createAttributesList(ocnode)
+        val atribList = OctreeUtils.createAttributesList(ocnode)
         (atribList foldRight List[Octree[Placement]]()) ((h,t) => {
           intersectsCamera(h, camVolume); t
         })
@@ -264,7 +260,6 @@ val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32
 
     }
   }
-
 
   override def init(): Unit = {
     println("init")

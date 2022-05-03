@@ -152,24 +152,24 @@ val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32
     scene.setOnKeyPressed(event => { event.getCode match {
       case KeyCode.UP =>
         camVolume.setTranslateY(camVolume.getTranslateY - 2)
-        intersectsCamera(oct2,camVolume)
+        intersectsCamera2(oct2,camVolume)
       //        worldRoot.getChildren.removeAll()
       case KeyCode.DOWN =>
         camVolume.setTranslateY(camVolume.getTranslateY + 2)
-        intersectsCamera(oct2,camVolume)
+        intersectsCamera2(oct2,camVolume)
       //        worldRoot.getChildren.removeAll()
       case KeyCode.LEFT =>
         camVolume.setTranslateX(camVolume.getTranslateX - 2)
-        intersectsCamera(oct2,camVolume)
+        intersectsCamera2(oct2,camVolume)
       //        worldRoot.getChildren.removeAll()
       case KeyCode.RIGHT =>
         camVolume.setTranslateX(camVolume.getTranslateX + 2)
-        intersectsCamera(oct2,camVolume)
+        intersectsCamera2(oct2,camVolume)
       //        worldRoot.getChildren.removeAll()
       case _ =>
     }
     })
-    intersectsCamera(oct2, camVolume)
+    intersectsCamera2(oct2, camVolume)
 //    scaleOctree(2, oct2)
 //    mapColourEffect(x => OcNode.greenRemove(x))(oct2)
   }
@@ -216,6 +216,49 @@ val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32
               t
             })
           }
+
+      case _ =>
+
+    }
+  }
+  def intersectsCamera2(oct:Octree[Placement], camVolume: Cylinder):Unit = {
+    oct match {
+      // Se for um ocNode
+      case _: OcNode[Placement] =>
+        println("SOU UM NODE")
+        val ocnode = oct.asInstanceOf[OcNode[Placement]]
+        val atribList = OcNode.createAttributesList(ocnode)
+        (atribList foldRight List[Octree[Placement]]()) ((h,t) => {
+          intersectsCamera(h, camVolume); t
+        })
+
+        // Se for uma ocLeaf
+      //Gabriela -> Depois de testar, ví que a função nunca entra aqui
+      case _: OcLeaf[Placement, Section] =>
+          println("SOU UMA LEAF")
+          val ocleaf = oct.asInstanceOf[OcLeaf[Placement, Section]]
+          val listaSection = ocleaf.section._2
+          // Se a lista de nodes da section nao estiver vazia
+            listaSection.foldRight(0)((h, t) => {
+              h.asInstanceOf[Shape3D]
+              if (h.isInstanceOf[Box]) {
+                val box = h.asInstanceOf[Box]
+                //Verifica se é uma wiredBox?
+                if (box.getDrawMode.equals(DrawMode.LINE)) {
+                  // Se intersetar
+                  if (camVolume.asInstanceOf[Shape3D].getBoundsInParent.intersects(box.getBoundsInParent)) {
+                    val greenMaterial = new PhongMaterial()
+                    greenMaterial.setDiffuseColor(Color.rgb(0, 255, 0))
+                    box.setMaterial(greenMaterial)
+                  } else {
+                    val redMaterial = new PhongMaterial()
+                    redMaterial.setDiffuseColor(Color.rgb(150, 0, 0))
+                    box.setMaterial(redMaterial)
+                  }
+                }
+              }
+              t
+            })
 
       case _ =>
 

@@ -1,5 +1,4 @@
 import OcNode.Placement
-import Octree.Section
 import javafx.scene.{Group, Node}
 import javafx.scene.shape.{Box, Cylinder, DrawMode, Shape3D}
 import javafx.scene.paint.{Color, PhongMaterial}
@@ -21,8 +20,7 @@ case class OcNode[A](placement: A,
 
   def createAttributesList(e:OcNode[Placement]):List[Octree[Placement]] = OcNode.createAttributesList(e)
 
-  def createTree2(worldRoot:Group, shapeList: List[Shape3D], root: Placement):Octree[Placement] =
-    OcNode.createTree(worldRoot, shapeList, root)
+  def createTree(worldRoot:Group, shapeList: List[Shape3D], root: Placement):Octree[Placement] = OcNode.createTree(worldRoot, shapeList, root)
 
 }
 
@@ -32,14 +30,6 @@ case object OcEmpty extends Octree[Nothing]
 
 case object OctreeUtils extends Octree[Nothing]
 
-object Octree {
-
-  type Point = (Double, Double, Double)
-  type Size = Double
-  type Placement = (Point, Size) //1st point: origin, 2nd point: size
-  type Section = (Placement, List[Node])
-
-}
 
 object OcNode {
 
@@ -47,79 +37,17 @@ object OcNode {
   type Point = (Double, Double, Double)
   type Size = Double
   type Placement = (Point, Size) //1st point: origin, 2nd point: size
+  type Section = (Placement, List[Node])
 
   def addTwoPoints(p1: Point, p2: Point): Point = {
     (p1._1 + p2._1, p1._2 + p2._2, p1._3 + p2._3)
   }
 
-
   //  --- T4 ---
   def scaleOctree(fact: Double, oct: Octree[Placement]): Octree[Placement] = fact match {
     case 0.5 | 2 => auxScale(fact, oct, oct)
-
     case _ => println("--> Fator inválido!!!"); throw new IllegalArgumentException("Argumento inválido: Não foi possível efetuar scale, factor inválido ")
   }
-
-
-//  def checkInBounds(fact: Double, oct: Octree[Placement]): Boolean = {
-//
-//    val root = oct.asInstanceOf[OcNode[Placement]]
-//
-//
-//    val list_Ocnodes = createAttributesList(root)
-//
-//
-//    val wiredBox = createWiredBox((16, 16, 16), 40)
-//
-//    list_Ocnodes.foldRight()((h, t) => {
-//
-//      if (h.isInstanceOf[OcNode[Placement]]) {
-//        checkInBounds(fact, h)
-//      }
-//      if (h.isInstanceOf[OcLeaf[Placement, Section]]) {
-//        val shapeList = h.asInstanceOf[OcLeaf[Placement, Section]].section._2
-//        (shapeList foldRight List[Node]()) ((h, t) => {
-//          var copia: Shape3D = null
-//          val originalX = h.getScaleX
-//          val originalY = h.getScaleY
-//          val originalZ = h.getScaleZ
-//
-//
-//          if (h.isInstanceOf[Box]) {
-//            val box = h.asInstanceOf[Box]
-//            copia = new Box(box.getWidth, box.getHeight, box.getDepth)
-//
-//            copia.setScaleX(originalX * fact)
-//            copia.setScaleY(originalY * fact)
-//            copia.setScaleZ(originalZ * fact)
-//
-//          }
-//
-//          if (h.isInstanceOf[Cylinder]) {
-//            val cylinder = h.asInstanceOf[Cylinder]
-//            copia = new Cylinder(cylinder.getRadius, cylinder.getHeight, cylinder.getDivisions)
-//
-//            copia.setScaleX(originalX * fact)
-//            copia.setScaleY(originalY * fact)
-//            copia.setScaleZ(originalZ * fact)
-//
-//
-//          }
-//
-//          if (wiredBox.getBoundsInParent.contains(copia.getBoundsInParent)) {
-//            println("DENTRO")
-//            t
-//          }
-//          else {
-//            println("Shape fora dos limites, operação de scale cancelada")
-//            return false
-//          }
-//        })
-//      }
-//    })
-//
-//    true
-//  }
 
   def auxScale(fact: Double, oct: Octree[Placement], originalOct: Octree[Placement]): Octree[Placement] = {
 
@@ -153,16 +81,18 @@ object OcNode {
 
     root
   }
-
+  /*  Devolve os todos os atributos de um node, exceto o primeiro, que é o placement */
   def createAttributesList(e: OcNode[Placement]): List[Octree[Placement]] = {
+    val numAtributos = e.productArity
+    //Função auxiliar que itera sobre todos os atributos do node e devolve uma lista com os mesmos (exceto o placement)
     @tailrec
-    def iterate(e: OcNode[Placement], l: List[Octree[Placement]], s: Int): List[Octree[Placement]] = {
-      if (s == e.productArity) l else iterate(e, l :+ e.productElement(s).asInstanceOf[Octree[Placement]], s + 1)
+    def iterate(e: OcNode[Placement], l: List[Octree[Placement]], iter: Int): List[Octree[Placement]] = {
+      if (iter == numAtributos) l else iterate(e, l :+ e.productElement(iter).asInstanceOf[Octree[Placement]], iter + 1)
     }
-
     iterate(e, List[Octree[Placement]](), 1)
   }
 
+  /*  Devolve uma octree igual, mas com a tree (element) dada na posição indicada pelo index */
   def putElementAt(node: Octree[Placement], element: Octree[Placement], index: Int): Octree[Placement] = {
     index match {
       case 0 => node.asInstanceOf[OcNode[Placement]].copy(up_00 = element)
@@ -173,6 +103,7 @@ object OcNode {
       case 5 => node.asInstanceOf[OcNode[Placement]].copy(down_01 = element)
       case 6 => node.asInstanceOf[OcNode[Placement]].copy(down_10 = element)
       case 7 => node.asInstanceOf[OcNode[Placement]].copy(down_11 = element)
+      case _ => println(" (putElementAt) ERRO -> indíce inválido"); node
     }
   }
 

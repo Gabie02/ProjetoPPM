@@ -1,3 +1,4 @@
+import OcNode.scaleOctree
 import javafx.application.Application
 import javafx.geometry.Insets
 import javafx.scene.paint.PhongMaterial
@@ -170,7 +171,7 @@ val oct2 = OcNode.createTree(worldRoot, listaShapes.toList,((16.0,16.0,16.0), 32
     }
     })
     intersectsCamera2(oct2, camVolume)
-//    scaleOctree(2, oct2)
+    scaleOctree(2, oct2)
 //    mapColourEffect(x => OcNode.greenRemove(x))(oct2)
   }
   //  --- T3 ---

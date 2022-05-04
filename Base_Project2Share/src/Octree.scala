@@ -45,11 +45,11 @@ object OcNode {
 
   //  --- T4 ---
   def scaleOctree(fact: Double, oct: Octree[Placement]): Octree[Placement] = fact match {
-    case 0.5 | 2 => auxScale(fact, oct, oct)
+    case 0.5 | 2 => auxScale(fact, oct)
     case _ => println("--> Fator inválido!!!"); throw new IllegalArgumentException("Argumento inválido: Não foi possível efetuar scale, factor inválido ")
   }
 
-  def auxScale(fact: Double, oct: Octree[Placement], originalOct: Octree[Placement]): Octree[Placement] = {
+  def auxScale(fact: Double, oct: Octree[Placement]): Octree[Placement] = {
 
     val root = oct.asInstanceOf[OcNode[Placement]]
 
@@ -58,27 +58,22 @@ object OcNode {
     list_Ocnodes.foldRight()((h, _) => {
       h match {
         case _: OcNode[Placement] =>
-        auxScale(fact, h, originalOct)
+        auxScale(fact, h)
 
         case _: OcLeaf[Placement, Section] =>
         val shapeList = h.asInstanceOf[OcLeaf[Placement, Section]].section._2
-        (shapeList foldRight List[Node]()) ((h, t) => {
-          val originalX = h.getScaleX
-          val originalY = h.getScaleY
-          val originalZ = h.getScaleZ
 
-
-          println("Shape after: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
-          h.setScaleX(originalX * fact)
-          h.setScaleY(originalY * fact)
-          h.setScaleZ(originalZ * fact)
+        (shapeList foldRight ()) ((h, t) => {
+          //println("Shape before: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
+          h.setScaleX(h.getScaleX * fact)
+          h.setScaleY(h.getScaleY * fact)
+          h.setScaleZ(h.getScaleZ * fact)
           t
-
+          //println("Shape after: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
         })
         case _ =>
     }
     })
-
     root
   }
   /*  Devolve os todos os atributos de um node, exceto o primeiro, que é o placement */

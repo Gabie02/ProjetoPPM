@@ -7,6 +7,8 @@ import javafx.scene.transform.Rotate
 
 object InitSubScene{
 
+
+
   //Materials to be applied to the 3D objects
   val redMaterial = new PhongMaterial()
   redMaterial.setDiffuseColor(Color.rgb(150,0,0))
@@ -34,7 +36,19 @@ object InitSubScene{
   camVolume.setMaterial(blueMaterial)
   camVolume.setDrawMode(DrawMode.LINE)
 
-  val worldRoot:Group = new Group(camVolume, lineX, lineY, lineZ)
+
+//    --- T1 ---
+  //Leitura do ficheiro de configuração
+      //val listaShapes = IO_Utils.readFromFile(params.getRaw.get(0))
+
+      // 3D objects (group of nodes - javafx.scene.Node) that will be provide to the subScene
+      val worldRoot:Group = new Group(camVolume, lineX, lineY, lineZ)
+
+      //Adicionar shapes à scene
+//      (listaShapes foldRight ()) ((h, t) => {
+//        worldRoot.getChildren.add(h); t
+//      })
+  //val worldRoot:Group = new Group(camVolume, lineX, lineY, lineZ)
 
   // Camera
   val camera = new PerspectiveCamera(true)
@@ -57,8 +71,8 @@ object InitSubScene{
 
   val cameraView = new CameraView(subScene)
   cameraView.setFirstPersonNavigationEabled(true)
-  cameraView.setFitWidth(350)
-  cameraView.setFitHeight(225)
+  cameraView.setFitWidth(200)
+  cameraView.setFitHeight(175)
   cameraView.getRx.setAngle(-45)
   cameraView.getT.setZ(-100)
   cameraView.getT.setY(-500)

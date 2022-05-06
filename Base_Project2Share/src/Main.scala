@@ -1,3 +1,4 @@
+import OcNode.scaleOctree
 import javafx.application.Application
 import javafx.geometry.Insets
 import javafx.scene.paint.PhongMaterial
@@ -166,7 +167,7 @@ class Main extends Application {
     }
     })
     intersectsCamera2(oct2, camVolume)
-//    scaleOctree(2, oct2)
+    scaleOctree(2, oct2)
 //    mapColourEffect(x => OcNode.greenRemove(x))(oct2)
   }
   //  --- T3 ---

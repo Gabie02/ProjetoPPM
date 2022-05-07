@@ -1,43 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.SubScene?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.text.Font?>
 
-<GridPane fx:id="gridPane1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
-  <columnConstraints>
-    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="318.0" minWidth="10.0" prefWidth="104.0" />
-      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="318.0" minWidth="10.0" prefWidth="103.0" />
-      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="318.0" minWidth="10.0" prefWidth="93.0" />
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="460.0" minWidth="10.0" prefWidth="301.0" />
-  </columnConstraints>
-  <rowConstraints>
-    <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-  </rowConstraints>
-   <children>
-      <Button mnemonicParsing="false" text="Fazer Scale" />
-      <RadioButton mnemonicParsing="false" selected="true" text="Fator 2" GridPane.columnIndex="1">
-         <toggleGroup>
-            <ToggleGroup fx:id="Scale" />
-         </toggleGroup>
-      </RadioButton>
-      <RadioButton mnemonicParsing="false" text="Fator 0.5" toggleGroup="$Scale" GridPane.columnIndex="2" />
-      <RadioButton mnemonicParsing="false" selected="true" text="Efeito sépia" GridPane.columnIndex="1" GridPane.rowIndex="1">
-         <toggleGroup>
-            <ToggleGroup fx:id="Cor" />
-         </toggleGroup></RadioButton>
-      <RadioButton mnemonicParsing="false" prefHeight="34.0" prefWidth="93.0" text="Remover cor verde" toggleGroup="$Cor" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-      <RadioButton mnemonicParsing="false" selected="true" text="Cor normal" toggleGroup="$Cor" GridPane.rowIndex="1" />
-      <AnchorPane fx:id="anchorPane1" prefHeight="212.0" prefWidth="301.0" GridPane.columnIndex="3" GridPane.rowIndex="1">
+<SplitPane dividerPositions="0.26753507014028055" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+  <items>
+      <Accordion>
+        <panes>
+          <TitledPane animated="false" prefHeight="748.0" prefWidth="325.0" text="Mudar cor">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutY="4.0" prefHeight="20.0" prefWidth="165.0" text="Mudar a cor dos Objetos">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <RadioButton layoutX="188.0" layoutY="64.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="87.0" text="Remover cor verde" wrapText="true">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="cor" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton layoutX="14.0" layoutY="64.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="87.0" selected="true" text="Cor normal" toggleGroup="$cor" wrapText="true" />
+                        <RadioButton layoutX="101.0" layoutY="64.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="87.0" text="Efeito Sépia" toggleGroup="$cor" wrapText="true" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </TitledPane>
+          <TitledPane animated="false" text="Mudar escala">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Button layoutX="14.0" layoutY="117.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="97.0" text="Aplicar escala" wrapText="true" />
+                        <Label layoutY="4.0" text="Mudar a escala dos objetos">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <RadioButton layoutX="98.0" layoutY="80.0" mnemonicParsing="false" selected="true" text="Fator 0.5" wrapText="true">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="scale" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton layoutX="14.0" layoutY="80.0" mnemonicParsing="false" prefWidth="58.0" selected="true" text="Fator 2" toggleGroup="$scale" wrapText="true" />
+                        <Label layoutX="14.0" layoutY="48.0" text="Escala">
+                           <font>
+                              <Font size="13.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </TitledPane>
+          <TitledPane animated="false" text="Visibilidade da OcTree">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutY="4.0" prefHeight="20.0" prefWidth="165.0" text="Fazer a OcTree visível">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <ToggleButton layoutX="14.0" layoutY="54.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="97.0" style="-fx-background-color: Green;" text="Visível">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </ToggleButton>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </TitledPane>
+        </panes>
+      </Accordion>
+    <AnchorPane fx:id="anchorPane1" minHeight="0.0" minWidth="0.0" prefHeight="798.0" prefWidth="610.0">
          <children>
-            <SubScene fx:id="subScene1" height="140.0" layoutX="-1.0" layoutY="1.0" width="301.0">
+            <SubScene fx:id="subScene1" fill="BLACK" height="398.0" width="417.0">
               <root>
                 <Region />
               </root>
             </SubScene>
-         </children>
-      </AnchorPane>
-   </children>
-</GridPane>
+         </children></AnchorPane>
+  </items>
+</SplitPane>

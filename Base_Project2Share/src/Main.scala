@@ -34,7 +34,7 @@ class Main extends Application {
 //        val params = getParameters
 //        println("Program arguments:" + params.getRaw)
 
-    stage.setTitle("TUDO")
+    stage.setTitle("Projeto PPM 21/22")
     val fxmlLoader = new FXMLLoader(getClass.getResource("Controller.fxml"))
     val mainViewRoot: Parent = fxmlLoader.load()
     val scene = new Scene(mainViewRoot)

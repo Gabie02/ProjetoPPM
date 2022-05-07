@@ -5,6 +5,8 @@ import scala.collection.mutable.ListBuffer
 
 object IO_Utils {
 
+
+
   // Consergue ler ficheiros que estejam na mesma diretoria da main
   def readFromFile(file: String):Array[Shape3D] = {
     val shapes = new ListBuffer[Shape3D]()

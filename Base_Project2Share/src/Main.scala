@@ -284,10 +284,10 @@ class Main extends Application {
 object FxApp {
 
   def main(args: Array[String]): Unit = {
-    Application.launch(classOf[Main], args: _*)
+    IO_Utils.mainLoop()
+//    Application.launch(classOf[Main], args: _*)
 
   }
-
 
 }
 

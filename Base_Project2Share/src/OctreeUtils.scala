@@ -6,7 +6,6 @@ import scala.annotation.tailrec
 
 object OctreeUtils {
 
-
   //Auxiliary types
   type Point = (Double, Double, Double)
   type Size = Double
@@ -72,7 +71,7 @@ object OctreeUtils {
       case 5 => node.asInstanceOf[OcNode[Placement]].copy(down_01 = element)
       case 6 => node.asInstanceOf[OcNode[Placement]].copy(down_10 = element)
       case 7 => node.asInstanceOf[OcNode[Placement]].copy(down_11 = element)
-      case _ => println(" (putElementAt) ERRO -> indíce inválido"); node
+      case _ => println(" (putElementAt) ERRO -> indice inválido"); node
     }
   }
 
@@ -139,21 +138,22 @@ object OctreeUtils {
 
             //Se não puder ser dividida
             //Se nessa partição já existir uma leaf, adicionar o novo objeto à leaf
-          } else if (tree.asInstanceOf[OcNode[Placement]].productElement(i).isInstanceOf[OcLeaf[Placement, Section]]) {
+          } else tree.asInstanceOf[OcNode[Placement]].productElement(i) match {
+            case value: OcLeaf[Placement, Section] =>
 
-            val list = tree.asInstanceOf[OcNode[Placement]].productElement(i).asInstanceOf[OcLeaf[Placement, Section]].section._2
-            worldRoot.getChildren.add(partition)
-            //retorna uma nova árvore com a lista atualizada e o elemento, mais a partição, no seu sitio
-            val finalTree = putElementAt(tree, new OcLeaf[Placement, Section]((corners(i), size / 2), list :+ h :+ partition), i).asInstanceOf[OcNode[Placement]]
-            return iterateThroughCorners(finalTree, corners, i + 1, stop)
+              val list = value.section._2
+              worldRoot.getChildren.add(partition)
+              //retorna uma nova árvore com a lista atualizada e o elemento, mais a partição, no seu sitio
+              val finalTree = putElementAt(tree, new OcLeaf[Placement, Section]((corners(i), size / 2), list :+ h :+ partition), i).asInstanceOf[OcNode[Placement]]
+              return iterateThroughCorners(finalTree, corners, i + 1, stop)
 
             //Se não existir uma leaf ainda, fazer uma nova
-          } else {
+            case _ =>
 
-            worldRoot.getChildren.add(partition)
-            //retorna uma nova árvore com a lista com o elemento e a partição no seu sitio
-            val finalTree = putElementAt(tree, new OcLeaf[Placement, Section]((corners(i), size / 2), List(h, partition)), i).asInstanceOf[OcNode[Placement]]
-            return iterateThroughCorners(finalTree, corners, i + 1, stop)
+              worldRoot.getChildren.add(partition)
+              //retorna uma nova árvore com a lista com o elemento e a partição no seu sitio
+              val finalTree = putElementAt(tree, new OcLeaf[Placement, Section]((corners(i), size / 2), List(h, partition)), i).asInstanceOf[OcNode[Placement]]
+              return iterateThroughCorners(finalTree, corners, i + 1, stop)
 
           }
 

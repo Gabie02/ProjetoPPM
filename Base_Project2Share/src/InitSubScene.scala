@@ -1,3 +1,4 @@
+import javafx.application.Application
 import javafx.geometry.{Insets, Pos}
 import javafx.scene.{Group, PerspectiveCamera, SceneAntialiasing, SubScene}
 import javafx.scene.layout.StackPane
@@ -6,8 +7,6 @@ import javafx.scene.shape.{Cylinder, DrawMode, Line}
 import javafx.scene.transform.Rotate
 
 object InitSubScene{
-
-
 
   //Materials to be applied to the 3D objects
   val redMaterial = new PhongMaterial()

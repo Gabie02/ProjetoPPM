@@ -4,12 +4,6 @@ import javafx.scene.shape.{Box, Cylinder, Shape3D}
 import java.io.FileNotFoundException
 import scala.util.{Failure, Success, Try}
 
-case class GraphicModelConstructor() {
-
-  def buildObject(line: String): Shape3D = {GraphicModelConstructor.buildObject(line).get}
-
-}
-
 object GraphicModelConstructor {
 
   type Translate = (Int, Int, Int)

@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.SubScene?>
-<?import javafx.scene.control.Accordion?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TitledPane?>
-<?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.control.ToggleGroup?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<SplitPane dividerPositions="0.26753507014028055" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+<SplitPane dividerPositions="0.26753507014028055" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
   <items>
       <Accordion>
         <panes>
@@ -47,12 +39,12 @@
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <RadioButton layoutX="98.0" layoutY="80.0" mnemonicParsing="false" selected="true" text="Fator 0.5" wrapText="true">
+                        <RadioButton layoutX="95.0" layoutY="80.0" mnemonicParsing="false" selected="true" text="Fator 0.5" wrapText="true">
                            <toggleGroup>
                               <ToggleGroup fx:id="scale" />
                            </toggleGroup>
                         </RadioButton>
-                        <RadioButton layoutX="14.0" layoutY="80.0" mnemonicParsing="false" prefWidth="58.0" selected="true" text="Fator 2" toggleGroup="$scale" wrapText="true" />
+                        <RadioButton layoutX="14.0" layoutY="80.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="76.0" selected="true" text="Fator 2" toggleGroup="$scale" />
                         <Label layoutX="14.0" layoutY="48.0" text="Escala">
                            <font>
                               <Font size="13.0" />

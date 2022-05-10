@@ -61,17 +61,20 @@ object OctreeUtils {
   }
 
   /*  Devolve uma octree igual, mas com a tree (element) dada na posição indicada pelo index */
-  def putElementAt(node: Octree[Placement], element: Octree[Placement], index: Int): Octree[Placement] = {
+  def putElementAt(tree: Octree[Placement], element: Octree[Placement], index: Int): Octree[Placement] = {
+    val node = tree.asInstanceOf[OcNode[Placement]]
     index match {
-      case 0 => node.asInstanceOf[OcNode[Placement]].copy(up_00 = element)
-      case 1 => node.asInstanceOf[OcNode[Placement]].copy(up_01 = element)
-      case 2 => node.asInstanceOf[OcNode[Placement]].copy(up_10 = element)
-      case 3 => node.asInstanceOf[OcNode[Placement]].copy(up_11 = element)
-      case 4 => node.asInstanceOf[OcNode[Placement]].copy(down_00 = element)
-      case 5 => node.asInstanceOf[OcNode[Placement]].copy(down_01 = element)
-      case 6 => node.asInstanceOf[OcNode[Placement]].copy(down_10 = element)
-      case 7 => node.asInstanceOf[OcNode[Placement]].copy(down_11 = element)
-      case _ => println(" (putElementAt) ERRO -> indice inválido"); node
+      case 0 => node.copy(up_00 = element)
+      case 1 => node.copy(up_01 = element)
+      case 2 => node.copy(up_10 = element)
+      case 3 => node.copy(up_11 = element)
+      case 4 => node.copy(down_00 = element)
+      case 5 => node.copy(down_01 = element)
+      case 6 => node.copy(down_10 = element)
+      case 7 => node.copy(down_11 = element)
+      case _ =>
+        println(" (putElementAt) ERRO -> indice inválido");
+        tree
     }
   }
 
@@ -95,15 +98,17 @@ object OctreeUtils {
   }
 
   def createWiredBox(origin: Point, size: Size): Shape3D = {
-    val box = new Box(size, size, size)
-    box.setTranslateY(origin._2)
-    box.setTranslateZ(origin._3)
-    box.setTranslateX(origin._1)
-    val redMaterial = new PhongMaterial()
-    redMaterial.setDiffuseColor(Color.rgb(150, 0, 0))
-    box.setMaterial(redMaterial)
-    box.setDrawMode(DrawMode.LINE)
-    box
+    //Testar !!!!
+    GraphicModelConstructor.createShape("Box", (150,0,0), (origin._1, origin._2, origin._3), (size, size, size))
+//    val box = new Box(size, size, size)
+//    box.setTranslateY(origin._2)
+//    box.setTranslateZ(origin._3)
+//    box.setTranslateX(origin._1)
+//    val redMaterial = new PhongMaterial()
+//    redMaterial.setDiffuseColor(Color.rgb(150, 0, 0))
+//    box.setMaterial(redMaterial)
+//    box.setDrawMode(DrawMode.LINE)
+//    box
   }
 
 

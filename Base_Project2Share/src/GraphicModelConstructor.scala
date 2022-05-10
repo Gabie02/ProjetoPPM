@@ -6,12 +6,11 @@ import scala.util.{Failure, Success, Try}
 
 object GraphicModelConstructor {
 
-  type Translate = (Int, Int, Int)
+  type Translate = (Double, Double, Double)
   type Scale = (Double, Double, Double)
   type Color = (Int, Int, Int)
 
-  def buildObject(line: String): Try[Shape3D] = {
-    try {
+  def buildObject(line: String): Shape3D = {
       val obj = line.split(" ")
       println(s"Length: ${obj.length}")
       val shape = obj(0)
@@ -19,18 +18,16 @@ object GraphicModelConstructor {
       val color = (values(0).toInt, values(1).toInt, values(2).toInt)
       obj.length match {
         case 8 =>
-          val translate = (obj(2).toInt, obj(3).toInt, obj(4).toInt)
+          val translate = (obj(2).toDouble, obj(3).toDouble, obj(4).toDouble)
           val scale = (obj(5).toDouble, obj(6).toDouble, obj(7).toDouble)
-          Success(createShape(shape, color, translate, scale))
+          createShape(shape, color, translate, scale)
         case 2 =>
-          val translate = (0,0,0)
+          val translate = (0.0,0.0,0.0)
           val scale = (1.0,1.0,1.0)
-          Success(createShape(shape, color, translate, scale))
-        case _ => Failure(new IllegalArgumentException("Ficheiro mal formatado"))
+          createShape(shape, color, translate, scale)
+        case _ => throw new IllegalArgumentException("Ficheiro mal formatado")
       }
-    } catch {
-      case e: FileNotFoundException => e.printStackTrace();Failure(new FileNotFoundException("Ficheiro não encontrado"));
-    }
+
   }
 
   def createShape(shape:String, color:Color, translate: Translate, scale: Scale): Shape3D = {
@@ -47,9 +44,10 @@ object GraphicModelConstructor {
       s.setMaterial(shapeColor)
       s
     }
-    shape match {
-      case "Box" => setShapes(new Box(1,1,1),color, translate, scale)
-      case "Cylinder" =>  setShapes(new Cylinder(0.5,1,10),color, translate, scale)
+    shape.toUpperCase match {
+      case "BOX" => setShapes(new Box(1,1,1),color, translate, scale)
+      case "CYLINDER" =>  setShapes(new Cylinder(0.5,1,10),color, translate, scale)
+      case _ => throw new IllegalArgumentException("Forma não suportada.")
     }
 
   }

@@ -21,7 +21,8 @@ class Controller {
     subScene1.heightProperty.bind(anchorPane1.heightProperty)
     subScene1.setRoot(InitSubScene.root)
 
-//    OctreeUtils.addOctreeToWorldRoot(IO_Utils.oct, InitSubScene.worldRoot)
+//    InitSubScene.worldRoot.getChildren.add(OctreeUtils.SPACE_LIMIT)
+    OctreeUtils.addOctreeToWorldRoot(IO_Utils.oct, InitSubScene.worldRoot)
 
   }
 }

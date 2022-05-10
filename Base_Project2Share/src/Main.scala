@@ -9,9 +9,6 @@ import javafx.scene.paint.Color
 
 class Main extends Application {
 
-  //Wiredbox que limita o espaço 3D
-  val SPACE_LIMIT:Shape3D = OctreeUtils.createWiredBox((0,0,0), 32)
-
   //Auxiliary types
   type Point = (Double, Double, Double)
   type Size = Double

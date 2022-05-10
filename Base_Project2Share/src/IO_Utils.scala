@@ -25,12 +25,12 @@ object IO_Utils {
 
   //Incompleto!!
   @tailrec
-  def mainLoop {
+  def mainLoop(oct ) {
     showPrompt()
     val userInput = getUserInput
 
     userInput.toUpperCase match {
-      case "A" =>
+      case "A" => oct1 = scal
         println("Diga qual o nome do ficheiro de texto que pretende usar: ")
         val file = getUserInput
         val shapes = Try(readFromFile(file))
@@ -79,4 +79,7 @@ object IO_Utils {
     GraphicModelConstructor.buildObject(line)
   }
 
+main
+  val oct1 = IO_Utils.mainLoop()
+  FxApp.main()
 }

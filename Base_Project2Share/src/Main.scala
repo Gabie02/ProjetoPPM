@@ -34,6 +34,10 @@ class Main extends Application {
 //        val params = getParameters
 //        println("Program arguments:" + params.getRaw)
 
+    if
+
+
+
     stage.setTitle("Projeto PPM 21/22")
     val fxmlLoader = new FXMLLoader(getClass.getResource("Controller.fxml"))
     val mainViewRoot: Parent = fxmlLoader.load()
@@ -283,10 +287,12 @@ class Main extends Application {
 
 object FxApp {
 
-  def main(args: Array[String]): Unit = {
-    IO_Utils.mainLoop()
-//    Application.launch(classOf[Main], args: _*)
+  val octree =
 
+  def main(args: Array[String]): Unit = {
+
+//    Application.launch(classOf[Main], args: _*)
+IO_Utils.oct1
   }
 
 }

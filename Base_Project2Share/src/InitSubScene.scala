@@ -8,6 +8,7 @@ import javafx.scene.transform.Rotate
 
 object InitSubScene{
 
+  IO_Utils.
   //Materials to be applied to the 3D objects
   val redMaterial = new PhongMaterial()
   redMaterial.setDiffuseColor(Color.rgb(150,0,0))

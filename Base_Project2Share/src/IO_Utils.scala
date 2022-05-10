@@ -21,35 +21,35 @@ object IO_Utils {
       "\nOpção: ")
   }
 
-  def getUserInput(): String = readLine.trim
+  def getUserInput: String = readLine.trim
 
   //Incompleto!!
   @tailrec
-  def mainLoop() {
+  def mainLoop {
     showPrompt()
-    val userInput = getUserInput()
+    val userInput = getUserInput
 
     userInput.toUpperCase match {
       case "A" =>
         println("Diga qual o nome do ficheiro de texto que pretende usar: ")
-        val file = getUserInput()
+        val file = getUserInput
         val shapes = Try(readFromFile(file))
         shapes match {
           case Success(s) =>
             println("Ficheiro lido com sucesso!")
             /* Guardar ficheiro em algum lado */
           case Failure(e) => e match {
-            case _:FileNotFoundException => println("Ficheiro não encontrado. Selecione outro."); mainLoop()
-            case e:IllegalArgumentException => println(e + " Selecione outro ficheiro."); mainLoop()
-            case _:IOException => println("Ocorreu um erro a ler o ficheiro. Selecione outro."); mainLoop()
+            case _:FileNotFoundException => println("Ficheiro não encontrado. Selecione outro."); mainLoop
+            case e:IllegalArgumentException => println(e + " Selecione outro ficheiro."); mainLoop
+            case _:IOException => println("Ocorreu um erro a ler o ficheiro. Selecione outro."); mainLoop
           }
         }
 
-      case "B" => mainLoop()
+      case "B" => mainLoop
 
-      case "C" => mainLoop()
+      case "C" => mainLoop
 
-      case "D" => mainLoop()
+      case "D" => mainLoop
 
       case "E" => Application.launch(classOf[Main])
 
@@ -57,7 +57,7 @@ object IO_Utils {
 
       case _  =>
         println("Input Inválido! Escolher uma das opções")
-        mainLoop()
+        mainLoop
     }
   }
 

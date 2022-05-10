@@ -1,8 +1,7 @@
 import javafx.scene.paint.{Color, PhongMaterial}
 import javafx.scene.shape.{Box, Cylinder, Shape3D}
-
-import java.io.FileNotFoundException
-import scala.util.{Failure, Success, Try}
+import scala.collection.mutable.ListBuffer
+import scala.io.Source
 
 object GraphicModelConstructor {
 
@@ -10,9 +9,26 @@ object GraphicModelConstructor {
   type Scale = (Double, Double, Double)
   type Color = (Int, Int, Int)
 
+  // Consergue ler ficheiros a partir da diretoria da main
+  def readFromFile(file: String): List[Shape3D] = {
+    val shapes = new ListBuffer[Shape3D]()
+    val dir = System.getProperty("user.dir")
+    val bufferedSource = Source.fromFile(s"$dir/$file")
+    if (bufferedSource.isEmpty)
+      println("Ficheiro vazio!")
+    for (line <- bufferedSource.getLines) {
+      shapes += convertShapes(line)
+    }
+    bufferedSource.close
+    shapes.toList
+  }
+
+  private def convertShapes(line: String):Shape3D = {
+    GraphicModelConstructor.buildObject(line)
+  }
+
   def buildObject(line: String): Shape3D = {
       val obj = line.split(" ")
-      println(s"Length: ${obj.length}")
       val shape = obj(0)
       val values = obj(1).replaceAll("[()]", "").split(",")
       val color = (values(0).toInt, values(1).toInt, values(2).toInt)
@@ -32,7 +48,6 @@ object GraphicModelConstructor {
 
   def createShape(shape:String, color:Color, translate: Translate, scale: Scale): Shape3D = {
     def setShapes(s:Shape3D, color:Color, translate: Translate, scale: Scale):Shape3D = {
-      println(s"Box: ${s.toString}")
       s.setTranslateX(translate._1)
       s.setTranslateY(translate._2)
       s.setTranslateZ(translate._3)

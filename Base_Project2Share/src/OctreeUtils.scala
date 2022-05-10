@@ -98,20 +98,28 @@ object OctreeUtils {
   }
 
   def createWiredBox(origin: Point, size: Size): Shape3D = {
-    //Testar !!!!
-    GraphicModelConstructor.createShape("Box", (150,0,0), (origin._1, origin._2, origin._3), (size, size, size))
-//    val box = new Box(size, size, size)
-//    box.setTranslateY(origin._2)
-//    box.setTranslateZ(origin._3)
-//    box.setTranslateX(origin._1)
-//    val redMaterial = new PhongMaterial()
-//    redMaterial.setDiffuseColor(Color.rgb(150, 0, 0))
-//    box.setMaterial(redMaterial)
-//    box.setDrawMode(DrawMode.LINE)
-//    box
+    val box = new Box(size, size, size)
+    box.setTranslateY(origin._2)
+    box.setTranslateZ(origin._3)
+    box.setTranslateX(origin._1)
+    val redMaterial = new PhongMaterial()
+    redMaterial.setDiffuseColor(Color.rgb(150, 0, 0))
+    box.setMaterial(redMaterial)
+    box.setDrawMode(DrawMode.LINE)
+    box
   }
 
+  def addOctreeToWorldRoot(oct:Octree[Placement], worldRoot: Group):Unit = oct match {
+    case n:OcNode[Placement] => addOctreeToWorldRoot(n, worldRoot)
+    case l:OcLeaf[Placement, Section] =>
+      val listShapes = l.section._2
+      (listShapes foldRight()) ((h, t) => {
+        worldRoot.getChildren.add(h); t
+      })
+    case _ =>
+  }
 
+  //Fazer com que esta função apenas crie as trees sem adicionar já na worldRoot
   /* --- T2 ---
   * Está em falta a implementação do algoritmo de otimização que trata dos conflitos entre
   *   diferentes partições para um shape, em que o mesmo devia ir para a partição "ascendente".
@@ -119,7 +127,12 @@ object OctreeUtils {
   *   por isso levando a com que possívelmente apareçam shapes que não se encontrem dentro de partições, ou
   *   em partições maiores do que deviam.
   * */
-  def createTree(worldRoot: Group, shapeList: List[Shape3D], root: Placement): Octree[Placement] = {
+
+  //Cria um octree sem especificar o tamanho da root
+  def createTree(shapeList: List[Shape3D]): Octree[Placement] = createTree(shapeList, ((16.0,16.0,16.0), 32))
+
+  //  def createTree(worldRoot: Group, shapeList: List[Shape3D], root: Placement): Octree[Placement] = {
+  def createTree(shapeList: List[Shape3D], root: Placement): Octree[Placement] = {
     val size = root._2
     val emptyOcNode = new OcNode[Placement](((0.0, 0.0, 0.0), size / 2), OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
     val corners = createCorners(root)
@@ -137,7 +150,8 @@ object OctreeUtils {
 
           //Se puder ser dividida em ainda mais partições, criar um node, que representa um novo ramo
           if (canBeDivided((corners(i), size / 2), h)) {
-            val node = createTree(worldRoot, shapeList, (corners(i), size / 2))
+//            val node = createTree(worldRoot, shapeList, (corners(i), size / 2))
+            val node = createTree(shapeList, (corners(i), size / 2))
             val finalTree = putElementAt(tree, node, i).asInstanceOf[OcNode[Placement]]
             return iterateThroughCorners(finalTree, corners, i + 1, stop)
 
@@ -147,7 +161,7 @@ object OctreeUtils {
             case value: OcLeaf[Placement, Section] =>
 
               val list = value.section._2
-              worldRoot.getChildren.add(partition)
+//              worldRoot.getChildren.add(partition)
               //retorna uma nova árvore com a lista atualizada e o elemento, mais a partição, no seu sitio
               val finalTree = putElementAt(tree, new OcLeaf[Placement, Section]((corners(i), size / 2), list :+ h :+ partition), i).asInstanceOf[OcNode[Placement]]
               return iterateThroughCorners(finalTree, corners, i + 1, stop)
@@ -155,7 +169,7 @@ object OctreeUtils {
             //Se não existir uma leaf ainda, fazer uma nova
             case _ =>
 
-              worldRoot.getChildren.add(partition)
+//              worldRoot.getChildren.add(partition)
               //retorna uma nova árvore com a lista com o elemento e a partição no seu sitio
               val finalTree = putElementAt(tree, new OcLeaf[Placement, Section]((corners(i), size / 2), List(h, partition)), i).asInstanceOf[OcNode[Placement]]
               return iterateThroughCorners(finalTree, corners, i + 1, stop)

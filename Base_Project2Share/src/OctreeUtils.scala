@@ -19,6 +19,17 @@ object OctreeUtils {
     (p1._1 + p2._1, p1._2 + p2._2, p1._3 + p2._3)
   }
 
+  def checkShapeSize(shape:Shape3D):Boolean = {
+
+    val box = createWiredBox((16, 16, 16),32)
+    val extent = shape.getBoundsInParent
+    val boolean = box.getBoundsInParent.contains(extent)
+
+    //println("X: " + extent + "boolean: " + boolean)
+
+    boolean
+  }
+
   //  --- T4 ---
   def scaleOctree(fact: Double, oct: Octree[Placement]): Octree[Placement] = fact match {
     case 0.5 | 2 => auxScale(fact, oct)

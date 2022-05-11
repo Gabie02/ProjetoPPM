@@ -62,7 +62,7 @@ object GraphicModelConstructor {
     shape.toUpperCase match {
       case "BOX" => setShapes(new Box(1,1,1),color, translate, scale)
       case "CYLINDER" =>  setShapes(new Cylinder(0.5,1,10),color, translate, scale)
-      case _ => throw new IllegalArgumentException("Forma não suportada.")
+      case _ => throw new IllegalArgumentException("Forma não suportada")
     }
 
   }

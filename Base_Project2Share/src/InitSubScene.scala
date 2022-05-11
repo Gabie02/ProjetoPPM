@@ -3,7 +3,7 @@ import javafx.geometry.{Insets, Pos}
 import javafx.scene.{Group, PerspectiveCamera, SceneAntialiasing, SubScene}
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.{Color, PhongMaterial}
-import javafx.scene.shape.{Cylinder, DrawMode, Line}
+import javafx.scene.shape.{Box, Cylinder, DrawMode, Line}
 import javafx.scene.transform.Rotate
 
 object InitSubScene{
@@ -36,13 +36,20 @@ object InitSubScene{
   camVolume.setMaterial(blueMaterial)
   camVolume.setDrawMode(DrawMode.LINE)
 
+  val wiredBox = new Box(32, 32, 32)
+  wiredBox.setTranslateX(16)
+  wiredBox.setTranslateY(16)
+  wiredBox.setTranslateZ(16)
+  wiredBox.setMaterial(redMaterial)
+  wiredBox.setDrawMode(DrawMode.LINE)
+
 
 //    --- T1 ---
   //Leitura do ficheiro de configuração
       //val listaShapes = IO_Utils.readFromFile(params.getRaw.get(0))
 
       // 3D objects (group of nodes - javafx.scene.Node) that will be provide to the subScene
-      val worldRoot:Group = new Group(camVolume, lineX, lineY, lineZ)
+      val worldRoot:Group = new Group(camVolume, lineX, lineY, lineZ, wiredBox)
 
       //Adicionar shapes à scene
 //      (listaShapes foldRight ()) ((h, t) => {

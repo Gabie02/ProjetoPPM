@@ -1,6 +1,6 @@
 import javafx.scene.{Group, Node}
 import javafx.scene.paint.{Color, PhongMaterial}
-import javafx.scene.shape.{Box, DrawMode, Shape3D}
+import javafx.scene.shape.{Box, Cylinder, DrawMode, Shape3D}
 
 import scala.annotation.tailrec
 
@@ -51,9 +51,32 @@ object OctreeUtils {
           val shapeList = h.asInstanceOf[OcLeaf[Placement, Section]].section._2
           (shapeList foldRight ()) ((h, t) => {
             //println("Shape before: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
+            h match {
+              case _: Box =>
+                val box = h.asInstanceOf[Box]
+                println("BOX" + box.getWidth/2)
+                println("PARENT" + box.getBoundsInParent.getWidth/2)
+                println(h.getBoundsInParent.getCenterX + " " + h.getBoundsInParent.getCenterY + " " + h.getBoundsInParent.getCenterZ)
+                val movement = box.getWidth/2 * box.getScaleX
+                h.setTranslateX(box.getBoundsInParent.getCenterX + movement)
+                h.setTranslateY(box.getBoundsInParent.getCenterY + movement)
+                h.setTranslateZ(box.getBoundsInParent.getCenterZ + movement)
+
+              case _: Cylinder =>
+                val cylinder = h.asInstanceOf[Cylinder]
+                println("Cylinder" + cylinder.getRadius)
+
+            }
+            //val movement = h.getBoundsInParent.getWidth /2
+            //println(movement)
+            //println("A" + h.getLayoutBounds.getCenterX + " " + movement)
+            //h.setTranslateX(h.getBoundsInParent.getCenterX + movement)
+            //h.setTranslateY(h.getBoundsInParent.getCenterY + movement)
+            //h.setTranslateZ(h.getBoundsInParent.getCenterZ + movement)
             h.setScaleX(h.getScaleX * fact)
             h.setScaleY(h.getScaleY * fact)
             h.setScaleZ(h.getScaleZ * fact)
+            
             t
             //println("Shape after: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
           })
@@ -87,7 +110,7 @@ object OctreeUtils {
       case 6 => node.copy(down_10 = element)
       case 7 => node.copy(down_11 = element)
       case _ =>
-        println(" (putElementAt) ERRO -> indice inválido");
+        println(" (putElementAt) ERRO -> indice inválido")
         tree
     }
   }
@@ -236,11 +259,21 @@ object OctreeUtils {
 
           val shapeList: List[Node] = partition.asInstanceOf[OcLeaf[Placement, Section]].section._2
           (shapeList foldRight List[Node]()) ((h, t) => {
-
             val material = h.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial]
             val color: Color = material.getDiffuseColor
-            material.setDiffuseColor(func(color))
-            t
+            h match {
+              case _: Box =>
+                val box = h.asInstanceOf[Box]
+                if(box.getDrawMode.equals(DrawMode.LINE)) {
+                  t
+                } else {
+                  material.setDiffuseColor(func(color))
+                  t
+                }
+              case _ =>
+                material.setDiffuseColor(func(color))
+                t
+            }
 
           })
 

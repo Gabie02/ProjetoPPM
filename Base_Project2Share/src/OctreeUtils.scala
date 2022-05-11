@@ -49,7 +49,7 @@ object OctreeUtils {
 
         case _: OcLeaf[Placement, Section] =>
           val shapeList = h.asInstanceOf[OcLeaf[Placement, Section]].section._2
-          (shapeList foldRight ()) ((h, t) => {
+          (shapeList foldRight List[Node]()) ((h, t) => {
             //println("Shape before: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
             h match {
               case _: Box =>
@@ -58,9 +58,10 @@ object OctreeUtils {
                 println("PARENT" + box.getBoundsInParent.getWidth/2)
                 println(h.getBoundsInParent.getCenterX + " " + h.getBoundsInParent.getCenterY + " " + h.getBoundsInParent.getCenterZ)
                 val movement = box.getWidth/2 * box.getScaleX
-                h.setTranslateX(box.getBoundsInParent.getCenterX + movement)
-                h.setTranslateY(box.getBoundsInParent.getCenterY + movement)
-                h.setTranslateZ(box.getBoundsInParent.getCenterZ + movement)
+                translate(shapeList,movement,h)
+//                h.setTranslateX(box.getBoundsInParent.getCenterX + movement)
+//                h.setTranslateY(box.getBoundsInParent.getCenterY + movement)
+//                h.setTranslateZ(box.getBoundsInParent.getCenterZ + movement)
 
               case _: Cylinder =>
                 val cylinder = h.asInstanceOf[Cylinder]
@@ -76,7 +77,7 @@ object OctreeUtils {
             h.setScaleX(h.getScaleX * fact)
             h.setScaleY(h.getScaleY * fact)
             h.setScaleZ(h.getScaleZ * fact)
-            
+
             t
             //println("Shape after: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
           })
@@ -86,6 +87,20 @@ object OctreeUtils {
 
     root
   }
+
+  def translate(list:List[Node], movement:Double, shapeIgnore:Node): Unit = {
+    (list foldRight ()) ((h, t) => {
+      h match {
+        case shapeIgnore => t
+        case _ =>
+          h.setTranslateX(h.getBoundsInParent.getCenterX + movement)
+          h.setTranslateY(h.getBoundsInParent.getCenterY + movement)
+          h.setTranslateZ(h.getBoundsInParent.getCenterZ + movement)
+          t
+      }
+    })
+  }
+
   /*  Devolve os todos os atributos de um node, exceto o primeiro, que é o placement */
   def createAttributesList(e: OcNode[Placement]): List[Octree[Placement]] = {
     val numAtributos = e.productArity

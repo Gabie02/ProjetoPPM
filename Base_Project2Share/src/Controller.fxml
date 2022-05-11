@@ -18,13 +18,14 @@
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <RadioButton layoutX="188.0" layoutY="64.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="87.0" text="Remover cor verde" wrapText="true">
+                        <RadioButton fx:id="button_greenRemove" layoutX="188.0" layoutY="64.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="87.0" text="Remover cor verde" wrapText="true">
                            <toggleGroup>
                               <ToggleGroup fx:id="cor" />
                            </toggleGroup>
                         </RadioButton>
-                        <RadioButton layoutX="14.0" layoutY="64.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="87.0" selected="true" text="Cor normal" toggleGroup="$cor" wrapText="true" />
-                        <RadioButton layoutX="101.0" layoutY="64.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="87.0" text="Efeito Sépia" toggleGroup="$cor" wrapText="true" />
+                        <RadioButton fx:id="button_normalColor" layoutX="14.0" layoutY="64.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="87.0" selected="true" text="Cor normal" toggleGroup="$cor" wrapText="true" />
+                        <RadioButton fx:id="button_sepia" layoutX="101.0" layoutY="64.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="87.0" text="Efeito Sépia" toggleGroup="$cor" wrapText="true" />
+                        <Button fx:id="button_color" layoutX="18.0" layoutY="105.0" mnemonicParsing="false" onMouseClicked="#onButtonClicked_color" text="Aplicar efeito de cor" />
                      </children>
                   </AnchorPane>
             </content>
@@ -33,18 +34,18 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Button layoutX="14.0" layoutY="117.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="97.0" text="Aplicar escala" wrapText="true" />
+                        <Button fx:id="button_scale" layoutX="14.0" layoutY="117.0" mnemonicParsing="false" onMouseClicked="#onButtonClicked_scale" prefHeight="25.0" prefWidth="97.0" text="Aplicar escala" wrapText="true" />
                         <Label layoutY="4.0" text="Mudar a escala dos objetos">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <RadioButton layoutX="95.0" layoutY="80.0" mnemonicParsing="false" selected="true" text="Fator 0.5" wrapText="true">
+                        <RadioButton fx:id="button_fator05" layoutX="95.0" layoutY="80.0" mnemonicParsing="false" selected="true" text="Fator 0.5" wrapText="true">
                            <toggleGroup>
                               <ToggleGroup fx:id="scale" />
                            </toggleGroup>
                         </RadioButton>
-                        <RadioButton layoutX="14.0" layoutY="80.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="76.0" selected="true" text="Fator 2" toggleGroup="$scale" />
+                        <RadioButton fx:id="button_fator2" layoutX="14.0" layoutY="80.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="76.0" selected="true" text="Fator 2" toggleGroup="$scale" />
                         <Label layoutX="14.0" layoutY="48.0" text="Escala">
                            <font>
                               <Font size="13.0" />
@@ -63,7 +64,7 @@
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <ToggleButton layoutX="14.0" layoutY="54.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="97.0" style="-fx-background-color: Green;" text="Visível">
+                        <ToggleButton fx:id="button_visible" layoutX="14.0" layoutY="54.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="97.0" style="-fx-background-color: Green;" text="Visível">
                            <font>
                               <Font name="System Bold" size="12.0" />
                            </font>

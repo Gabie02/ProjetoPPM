@@ -91,7 +91,6 @@ object OctreeUtils {
         case _ =>
       }
     })
-
     root
 
   }

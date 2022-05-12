@@ -7,7 +7,7 @@ import scala.annotation.tailrec
 object OctreeUtils {
 
   //Wiredbox que limita o espaço 3D
-  val SPACE_LIMIT:Shape3D = OctreeUtils.createWiredBox((0,0,0), 32)
+  val SPACE_LIMIT: Shape3D = OctreeUtils.createWiredBox((0, 0, 0), 32)
 
   //Auxiliary types
   type Point = (Double, Double, Double)
@@ -19,9 +19,9 @@ object OctreeUtils {
     (p1._1 + p2._1, p1._2 + p2._2, p1._3 + p2._3)
   }
 
-  def checkShapeSize(shape:Shape3D):Boolean = {
+  def checkShapeSize(shape: Shape3D): Boolean = {
 
-    val box = createWiredBox((16, 16, 16),32)
+    val box = createWiredBox((16, 16, 16), 32)
     val extent = shape.getBoundsInParent
     val boolean = box.getBoundsInParent.contains(extent)
 
@@ -32,7 +32,7 @@ object OctreeUtils {
 
   //  --- T4 ---
   def scaleOctree(fact: Double, oct: Octree[Placement]): Octree[Placement] = fact match {
-    case 0.5 | 2 => auxScale(fact, oct)
+    case 0.5 | 2 => auxScale2(fact, oct)
     case _ => println("--> Fator inválido!!!"); throw new IllegalArgumentException("Argumento inválido: Não foi possível efetuar scale, factor inválido ")
   }
 
@@ -46,7 +46,6 @@ object OctreeUtils {
       h match {
         case _: OcNode[Placement] =>
           auxScale(fact, h)
-
         case _: OcLeaf[Placement, Section] =>
           val shapeList = h.asInstanceOf[OcLeaf[Placement, Section]].section._2
           (shapeList foldRight List[Node]()) ((h, t) => {
@@ -54,14 +53,20 @@ object OctreeUtils {
             h match {
               case _: Box =>
                 val box = h.asInstanceOf[Box]
-                println("BOX" + box.getWidth/2)
-                println("PARENT" + box.getBoundsInParent.getWidth/2)
-                println(h.getBoundsInParent.getCenterX + " " + h.getBoundsInParent.getCenterY + " " + h.getBoundsInParent.getCenterZ)
-                val movement = box.getWidth/2 * box.getScaleX
-                translate(shapeList,movement,h)
-//                h.setTranslateX(box.getBoundsInParent.getCenterX + movement)
-//                h.setTranslateY(box.getBoundsInParent.getCenterY + movement)
-//                h.setTranslateZ(box.getBoundsInParent.getCenterZ + movement)
+                //                println("BOX" + box.getWidth/2)
+                //                println("PARENT" + box.getBoundsInParent.getWidth/2)
+                //                println(h.getBoundsInParent.getCenterX + " " + h.getBoundsInParent.getCenterY + " " + h.getBoundsInParent.getCenterZ)
+                //                println(h.getTranslateX + " " + h.getTranslateY + " " + h.getTranslateZ)
+                if (box.getDrawMode == DrawMode.LINE)
+                  println(s"Caixa $box é uma wiredBox")
+                val movement = box.getWidth / 2 * fact
+                shapeList.foreach( s => if(s != h) println("Antes de " + s + " fazer translate: " + s.getTranslateX + " " + s.getTranslateY + " " + s.getTranslateZ))
+                translate(shapeList, movement, h)
+                shapeList.foreach( s => if(s != h) println("Resultado da função translate para " + s + ": " + s.getTranslateX + " " + s.getTranslateY + " " + s.getTranslateZ))
+
+              //                h.setTranslateX(box.getBoundsInParent.getCenterX + movement)
+              //                h.setTranslateY(box.getBoundsInParent.getCenterY + movement)
+              //                h.setTranslateZ(box.getBoundsInParent.getCenterZ + movement)
 
               case _: Cylinder =>
                 val cylinder = h.asInstanceOf[Cylinder]
@@ -74,9 +79,11 @@ object OctreeUtils {
             //h.setTranslateX(h.getBoundsInParent.getCenterX + movement)
             //h.setTranslateY(h.getBoundsInParent.getCenterY + movement)
             //h.setTranslateZ(h.getBoundsInParent.getCenterZ + movement)
+            println("Centro antes do scale: " + h.getTranslateX + " " + h.getTranslateY + " " + h.getTranslateZ)
             h.setScaleX(h.getScaleX * fact)
             h.setScaleY(h.getScaleY * fact)
             h.setScaleZ(h.getScaleZ * fact)
+            println("Centro depois do scale: " + h.getTranslateX + " " + h.getTranslateY + " " + h.getTranslateZ)
 
             t
             //println("Shape after: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
@@ -86,29 +93,75 @@ object OctreeUtils {
     })
 
     root
+
   }
 
-  def translate(list:List[Node], movement:Double, shapeIgnore:Node): Unit = {
-    (list foldRight ()) ((h, t) => {
-      h match {
-        case shapeIgnore => t
-        case _ =>
-          h.setTranslateX(h.getBoundsInParent.getCenterX + movement)
-          h.setTranslateY(h.getBoundsInParent.getCenterY + movement)
-          h.setTranslateZ(h.getBoundsInParent.getCenterZ + movement)
-          t
+  def auxScale2(fact: Double, oct: Octree[Placement]): Octree[Placement] = {
+    val listaDeShapes = getAllShapes(oct)
+    println(listaDeShapes)
+    (listaDeShapes foldRight ())((h,_) => {
+      val movement = h.getBoundsInParent.getWidth / 2 * fact
+      println(s"Chamar função translate com $movement ao centro")
+      translate(listaDeShapes, movement, h)
+      listaDeShapes.foreach( s => if(s != h) println("Resultado da função translate para " + s + ": " + s.getTranslateX + " " + s.getTranslateY + " " + s.getTranslateZ))
+      println("Centro antes do scale: " + h.getTranslateX + " " + h.getTranslateY + " " + h.getTranslateZ)
+      h.setScaleX(h.getScaleX * fact)
+      h.setScaleY(h.getScaleY * fact)
+      h.setScaleZ(h.getScaleZ * fact)
+      println("Centro depois do scale: " + h.getTranslateX + " " + h.getTranslateY + " " + h.getTranslateZ)
+    })
+    oct
+  }
+
+  def getAllShapes(oct: Octree[Placement]):List[Node] = oct match {
+      case n: OcNode[Placement] =>
+        val atributos = createAttributesList(n)
+        (atributos foldRight List[Node]()) ((h, t) => {
+          getAllShapes(h)++t
+        })
+      case l: OcLeaf[Placement, Section] =>
+        l.section._2
+      case _ => List[Node]()
+    }
+
+  def translate(list: List[Node], movement: Double, shapeIgnore: Node): Unit = {
+    (list foldRight()) ((h, t) => {
+//            h match {
+//              case shapeIgnore =>
+//                println(s"Este é o shape a dar scale: $shapeIgnore e 0 h $h" )
+//                t
+//              case _ =>
+//                //redefenir o centro
+//                println(s"Este shape não é o shape a ignorar: $h")
+//                h.setTranslateX(h.getBoundsInParent.getCenterX + movement)
+//                h.setTranslateY(h.getBoundsInParent.getCenterY + movement)
+//                h.setTranslateZ(h.getBoundsInParent.getCenterZ + movement)
+//                t
+//            }
+      if (h == shapeIgnore) {
+        println(s"Este é o shape a ignorar: $shapeIgnore e o h $h")
+      } else {
+        println(s"Este shape NÃO é o shape a ignorar: $h")
+        println(s"Fazer translate com $movement ao centro: " + h.getTranslateX + " " + h.getTranslateY + " " + h.getTranslateZ)
+        h.setTranslateX(h.getTranslateX + movement)
+        h.setTranslateY(h.getTranslateY + movement)
+        h.setTranslateZ(h.getTranslateZ + movement)
+        println("Resultado do translate: " + h.getTranslateX + " " + h.getTranslateY + " " + h.getTranslateZ)
       }
+      t
     })
   }
 
   /*  Devolve os todos os atributos de um node, exceto o primeiro, que é o placement */
   def createAttributesList(e: OcNode[Placement]): List[Octree[Placement]] = {
     val numAtributos = e.productArity
+
     //Função auxiliar que itera sobre todos os atributos do node e devolve uma lista com os mesmos (exceto o placement)
     @tailrec
     def iterate(e: OcNode[Placement], l: List[Octree[Placement]], iter: Int): List[Octree[Placement]] = {
       if (iter == numAtributos) l else iterate(e, l :+ e.productElement(iter).asInstanceOf[Octree[Placement]], iter + 1)
     }
+
     iterate(e, List[Octree[Placement]](), 1)
   }
 
@@ -161,16 +214,18 @@ object OctreeUtils {
     box
   }
 
-  def addOctreeToWorldRoot(oct:Octree[Placement], worldRoot: Group):Unit = oct match {
-    case n:OcNode[Placement] =>
+  def addOctreeToWorldRoot(oct: Octree[Placement], worldRoot: Group): Unit = oct match {
+    case n: OcNode[Placement] =>
       val atributos = createAttributesList(n)
-      (atributos foldRight()) ((h,t) => {
-        addOctreeToWorldRoot(h, worldRoot); t
+      (atributos foldRight()) ((h, t) => {
+        addOctreeToWorldRoot(h, worldRoot)
+        t
       })
-    case l:OcLeaf[Placement, Section] =>
+    case l: OcLeaf[Placement, Section] =>
       val listShapes = l.section._2
       (listShapes foldRight()) ((h, t) => {
-        worldRoot.getChildren.add(h); t
+        worldRoot.getChildren.add(h)
+        t
       })
     case _ =>
   }
@@ -185,7 +240,7 @@ object OctreeUtils {
   * */
 
   //Cria um octree sem especificar o tamanho da root
-  def createTree(shapeList: List[Shape3D]): Octree[Placement] = createTree(shapeList, ((16.0,16.0,16.0), 32))
+  def createTree(shapeList: List[Shape3D]): Octree[Placement] = createTree(shapeList, ((16.0, 16.0, 16.0), 32))
 
   def createTree(shapeList: List[Shape3D], root: Placement): Octree[Placement] = {
     val size = root._2
@@ -255,6 +310,7 @@ object OctreeUtils {
   def greenRemove(c: Color): Color = {
     Color.rgb((c.getRed * 255).toInt, 0, (c.getBlue * 255).toInt)
   }
+
   //  --- T5 ---
   def mapColourEffect(func: Color => Color)(oct: Octree[Placement]): Octree[Placement] = {
     val root = oct.asInstanceOf[OcNode[Placement]]
@@ -279,7 +335,7 @@ object OctreeUtils {
             h match {
               case _: Box =>
                 val box = h.asInstanceOf[Box]
-                if(box.getDrawMode.equals(DrawMode.LINE)) {
+                if (box.getDrawMode.equals(DrawMode.LINE)) {
                   t
                 } else {
                   material.setDiffuseColor(func(color))

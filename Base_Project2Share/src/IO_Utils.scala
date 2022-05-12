@@ -15,7 +15,6 @@ object IO_Utils {
       "\nb) Mudar a cor da Tree " +
       "\nc) Mudar a escala da Tree" +
       "\nd) Lançar ambiente 3D" +
-//      "\nq) Sair" +
       "\nOpção: ")
   }
 
@@ -67,7 +66,6 @@ object IO_Utils {
           case "B" => mainLoop(OctreeUtils.scaleOctree(0.5, oct))
         }
       case "D" => oct
-//      case "Q" =>
       case _  =>
         println("Input Inválido! Escolher uma das opções")
         mainLoop(oct)

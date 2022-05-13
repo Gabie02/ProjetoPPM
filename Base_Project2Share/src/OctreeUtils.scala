@@ -212,7 +212,7 @@ object OctreeUtils {
 
   //Cria um octree sem especificar o tamanho da root (Tem como root o cubo que limita o espaço)
   def createTree(shapeList: List[Shape3D]): Octree[Placement] = createTree(shapeList, ((16.0, 16.0, 16.0), 32))
-  var teste = 0
+
   def createTree(shapeList: List[Shape3D], root: Placement): Octree[Placement] = {
     val size = root._2
     val emptyOcNode = new OcNode[Placement](((0.0, 0.0, 0.0), size / 2), OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
@@ -232,9 +232,7 @@ object OctreeUtils {
 
           //Se puder ser dividida em ainda mais partições, criar um node, que representa um novo ramo
           if (canBeDivided((partitions(i), size / 2), h)) {
-//            if (canBeDivided2((partitions(i), size / 2), h)) {
-            teste += 1
-            println(s"CanBeDivided verdadeiro: $teste para partição de tamanho ${size/2}")
+
             val node = createTree(shapeList, (partitions(i), size / 2))
             val finalTree = putElementAt(tree, node, i).asInstanceOf[OcNode[Placement]]
             //Iterar para a próxima partição

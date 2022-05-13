@@ -1,5 +1,5 @@
-import javafx.application.Application
 import javafx.geometry.{Insets, Pos}
+import javafx.scene.input.MouseButton
 import javafx.scene.{Group, PerspectiveCamera, SceneAntialiasing, SubScene}
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.{Color, PhongMaterial}
@@ -42,7 +42,6 @@ object InitSubScene{
   wiredBox.setTranslateZ(16)
   wiredBox.setMaterial(redMaterial)
   wiredBox.setDrawMode(DrawMode.LINE)
-
 
 //    --- T1 ---
   //Leitura do ficheiro de configuração
@@ -94,5 +93,13 @@ object InitSubScene{
   root.setOnMouseClicked((event) => {
     camVolume.setTranslateX(camVolume.getTranslateX + 2)
   })
-}
 
+
+  // ---T3---
+  //Quando se muda a visualização e movimento da camera, as partiçoes que estão dentro da camera de visualização, mudam de cor (verde neste caso)
+  root.setOnMouseClicked(event => { event.getButton() match {
+    case MouseButton.PRIMARY => OctreeUtils.intersectsCamera(IO_Utils.x, camVolume)
+    case _ =>
+  }})
+
+}

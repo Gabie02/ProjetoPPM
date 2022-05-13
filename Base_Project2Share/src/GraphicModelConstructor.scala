@@ -9,6 +9,7 @@ object GraphicModelConstructor {
   type Scale = (Double, Double, Double)
   type Color = (Int, Int, Int)
 
+  //  --- T1 ---
   // Consergue ler ficheiros a partir da diretoria da main
   def readFromFile(file: String): List[Shape3D] = {
     val shapes = new ListBuffer[Shape3D]()

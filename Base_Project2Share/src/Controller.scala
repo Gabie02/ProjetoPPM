@@ -4,10 +4,6 @@ import javafx.fxml.FXML
 import javafx.scene.control.{Button, RadioButton, ToggleButton, ToggleGroup}
 import javafx.scene.{Group, SubScene}
 import javafx.scene.layout.{AnchorPane, GridPane}
-import javafx.fxml.FXML
-import javafx.scene.control.ToggleGroup
-
-import java.awt.event.MouseEvent
 
 class Controller {
 
@@ -17,7 +13,6 @@ class Controller {
   private var gridPane1:GridPane = _
   @FXML
   private var anchorPane1:AnchorPane = _
-
   @FXML
   private var button_color : Button = _
   @FXML
@@ -33,7 +28,7 @@ class Controller {
   @FXML
   private var button_fator05 : RadioButton = _
 
-  //method automatically invoked after the @FXML fields have been injected
+  //  --- T7 ---
   @FXML
   def initialize(): Unit = {
     InitSubScene.subScene.widthProperty.bind(subScene1.widthProperty)
@@ -52,24 +47,14 @@ class Controller {
       else if (button_greenRemove.isSelected) OctreeUtils.mapColourEffect(c => OctreeUtils.greenRemove(c))(IO_Utils.x)
     }
 
-  //def onButtonClicked_scale(): Octree[((Double, Double, Double), OctreeUtils.Size)] = {
-    //case button_fator2.isSelected => button_scale.setOnMouseClicked(e=>OctreeUtils.scaleOctree(2, IO_Utils.oct))
-    //case button_fator05.isSelected  => button_scale.setOnMouseClicked(e=>OctreeUtils.scaleOctree(0.5, IO_Utils.oct))
-  //}
-
-
   def onButtonClicked_scale():Unit = {
-
-    //println("Botao 0.5: " + button_fator05.isSelected.toString)
-    //println("Botao 2: " + button_fator2.isSelected.toString)
 
     if (button_fator2.isSelected) OctreeUtils.scaleOctree(2, IO_Utils.x)
     else if(button_fator05.isSelected) OctreeUtils.scaleOctree(0.5, IO_Utils.x)
-
   }
 
     //def onButtonClicked_visible():Unit = {
-      //button_visible
+
     //}
 
 }

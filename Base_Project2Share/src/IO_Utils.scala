@@ -11,6 +11,7 @@ object IO_Utils extends App {
   val x = mainLoop(getFile)
   FxApp.main(args)
 
+  //  --- T6 ---
   def showPrompt(): Unit = {
     println("-- Options --" +
       "\na) Escolher outro ficheiro de configuração " +
@@ -39,7 +40,6 @@ object IO_Utils extends App {
       }
     }
   }
-
 
   @tailrec
   def mainLoop(oct:Octree[Placement]):Octree[Placement] = {
@@ -70,7 +70,6 @@ object IO_Utils extends App {
       case _  =>
         println("Input Inválido! Escolher uma das opções")
         mainLoop(oct)
-
     }
   }
 

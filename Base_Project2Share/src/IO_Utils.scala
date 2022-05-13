@@ -7,7 +7,6 @@ import scala.util.{Failure, Success, Try}
 
 object IO_Utils extends App {
 
-//  val oct = IO_Utils.getFile
   val x = mainLoop(getFile)
   FxApp.main(args)
 
@@ -31,8 +30,7 @@ object IO_Utils extends App {
       case Success(s) =>
         println("Ficheiro lido com sucesso!")
         OctreeUtils.createTree(s)
-//        val x = mainLoop(oct1)
-      /* Guardar ficheiro em algum lado */
+
       case Failure(e) => e match {
         case _:FileNotFoundException => println("Ficheiro não encontrado. Selecione outro."); getFile
         case e:IllegalArgumentException => println(e + " Selecione outro ficheiro."); getFile
@@ -75,7 +73,4 @@ object IO_Utils extends App {
     }
   }
 
-//  def main(args: Array[String]): Unit = {
-//
-//  }
 }

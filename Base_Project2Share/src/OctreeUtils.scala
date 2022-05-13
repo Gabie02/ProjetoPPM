@@ -50,7 +50,6 @@ object OctreeUtils {
     box.setTranslateX(origin._1)
     box.setTranslateY(origin._2)
     box.setTranslateZ(origin._3)
-    //    box.setMaterial(InitSubScene.redMaterial)
     val redMaterial = new PhongMaterial()
     redMaterial.setDiffuseColor(Color.rgb(150,0,0))
     box.setMaterial(redMaterial)

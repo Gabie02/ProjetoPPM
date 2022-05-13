@@ -1,6 +1,6 @@
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
-import javafx.scene.{Node, Parent, Scene}
+import javafx.scene.{Parent, Scene}
 import javafx.stage.Stage
 
 class Main extends Application {
@@ -27,6 +27,7 @@ class Main extends Application {
 
   override def stop(): Unit = {
     println("stopped")
+    GraphicModelConstructor.writeFile(IO_Utils.x)
   }
 }
 

@@ -1,5 +1,8 @@
+import OctreeUtils.Placement
 import javafx.scene.paint.{Color, PhongMaterial}
-import javafx.scene.shape.{Box, Cylinder, Shape3D}
+import javafx.scene.shape.{Box, Cylinder, DrawMode, Shape3D}
+
+import java.io.{File, PrintWriter}
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
@@ -67,5 +70,27 @@ object GraphicModelConstructor {
     }
 
   }
+
+  def writeFile(oct:Octree[Placement]):Unit = {
+    val leafsList = OctreeUtils.getAllShapes(oct)
+    val shapesList = leafsList.filterNot(s => s.isInstanceOf[Box] && (s.asInstanceOf[Box].getDrawMode == DrawMode.LINE))
+    val pw = new PrintWriter(new File("lastTree.txt"))
+    (shapesList foldRight ()) ((h, t) => {
+      h match {
+        case _: Box =>
+          val box = h.asInstanceOf[Box]
+          pw.write("Box" + " " + "(" + (box.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor.getRed * 255).toInt + "," + (box.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor.getGreen * 255).toInt + "," + (box.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor.getBlue * 255).toInt + ")" + " " + box.getTranslateX.toInt + " " + box.getTranslateY.toInt + " " + box.getTranslateZ.toInt + " " + box.getScaleX + " " + box.getScaleY + " " + box.getScaleZ + "\n")
+
+        case _: Cylinder =>
+          val cylinder = h.asInstanceOf[Cylinder]
+          pw.write("Cylinder" + " " + "(" + (cylinder.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor.getRed * 255).toInt + "," + (cylinder.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor.getGreen * 255).toInt + "," + (cylinder.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor.getBlue * 255).toInt + ")" + " " + cylinder.getTranslateX.toInt + " " + cylinder.getTranslateY.toInt + " " + cylinder.getTranslateZ.toInt + " " + cylinder.getScaleX + " " + cylinder.getScaleY + " " + cylinder.getScaleZ + "\n")
+
+        case _ =>
+      }
+      t
+    })
+    pw.close()
+  }
+
 
 }

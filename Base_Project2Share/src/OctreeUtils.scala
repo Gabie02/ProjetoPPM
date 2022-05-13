@@ -7,7 +7,7 @@ import scala.annotation.tailrec
 object OctreeUtils {
 
   //Wiredbox que limita o espaço 3D
-  val SPACE_LIMIT: Shape3D = OctreeUtils.createWiredBox((0, 0, 0), 32)
+//  val SPACE_LIMIT: Shape3D = OctreeUtils.createWiredBox((0, 0, 0), 32)
 
   //Auxiliary types
   type Point = (Double, Double, Double)
@@ -36,13 +36,12 @@ object OctreeUtils {
     case _ => println("--> Fator inválido!!!"); throw new IllegalArgumentException("Argumento inválido: Não foi possível efetuar scale, factor inválido ")
   }
 
-
   def auxScale(fact: Double, oct: Octree[Placement]): Octree[Placement] = {
     val listaDeShapes = getAllShapes(oct)
     (listaDeShapes foldRight ())((h,_) => {
-      h.setTranslateX(h.getBoundsInParent.getCenterX * fact)
-      h.setTranslateY(h.getBoundsInParent.getCenterY * fact)
-      h.setTranslateZ(h.getBoundsInParent.getCenterZ * fact)
+      h.setTranslateZ(h.getTranslateZ * fact)
+      h.setTranslateX(h.getTranslateX * fact)
+      h.setTranslateY(h.getTranslateY * fact)
       h.setScaleX(h.getScaleX * fact)
       h.setScaleY(h.getScaleY * fact)
       h.setScaleZ(h.getScaleZ * fact)
@@ -120,7 +119,8 @@ object OctreeUtils {
     }
   }
 
-  def createCorners(placement: Placement): List[Point] = {
+  //Cria todas as origens que fazem as partições de um espaço
+  def createOrigins(placement: Placement): List[Point] = {
     val point = placement._1
     val size = placement._2
     val newPoint = new Point(point._1 - size / 2, point._2 - size / 2, point._3 - size / 2)
@@ -131,21 +131,46 @@ object OctreeUtils {
 
   }
 
+  //Determina se um shape contido num node está contido numa partição do mesmo
+  // (Se a partição pode ser dividida para esse node)
   def canBeDivided(node: Placement, s: Shape3D): Boolean = {
-    val corners = createCorners(node)
-    (corners foldRight false) ((h, t) => {
+    val partitionsOrigins = createOrigins(node)
+    (partitionsOrigins foldRight false) ((h, t) => {
       val partition = createWiredBox(h, node._2 / 2)
       if (partition.getBoundsInParent.contains(s.getBoundsInParent)) true else t
     })
   }
 
+  def canBeDivided2(node: Placement, s: Shape3D): Boolean = {
+    val partitionsOrigins = createOrigins(node)
+    //Cópia do shape, mas com uma origem diferente
+//    val shapeCopy = s.clone().asInstanceOf[Shape3D]
+    val origin = (s.getTranslateX, s.getTranslateY, s.getTranslateZ)
+    (partitionsOrigins foldRight false) ((h, t) => {
+      s.setTranslateX(h._1)
+      s.setTranslateY(h._2)
+      s.setTranslateZ(h._3)
+//      val b = Bounds()
+      val partition = createWiredBox(h, node._2 / 2)
+      if (partition.getBoundsInParent.contains(s.getBoundsInParent)) {
+        s.setTranslateX(origin._1); s.setTranslateY(origin._2); s.setTranslateZ(origin._3)
+        true
+      } else{
+        s.setTranslateX(origin._1); s.setTranslateY(origin._2); s.setTranslateZ(origin._3)
+        t
+      }
+    })
+  }
+
+  //Cria uma wiredBox com o tamanho desejado
   def createWiredBox(origin: Point, size: Size): Shape3D = {
     val box = new Box(size, size, size)
+    box.setTranslateX(origin._1)
     box.setTranslateY(origin._2)
     box.setTranslateZ(origin._3)
-    box.setTranslateX(origin._1)
+//    box.setMaterial(InitSubScene.redMaterial)
     val redMaterial = new PhongMaterial()
-    redMaterial.setDiffuseColor(Color.rgb(150, 0, 0))
+    redMaterial.setDiffuseColor(Color.rgb(150,0,0))
     box.setMaterial(redMaterial)
     box.setDrawMode(DrawMode.LINE)
     box
@@ -166,6 +191,15 @@ object OctreeUtils {
       })
     case _ =>
   }
+//É meio estúpido porque vai devolver o mesmo shape
+  def shapeInTheRightPosition(shape: Shape3D, partition: Shape3D):Shape3D = {
+    if(!partition.getBoundsInParent.contains(shape.getBoundsInParent)) {
+      shape.setTranslateX(partition.getTranslateX)
+      shape.setTranslateY(partition.getTranslateY)
+      shape.setTranslateZ(partition.getTranslateZ)
+    }
+    shape
+  }
 
   //Fazer com que esta função apenas crie as trees sem adicionar já na worldRoot
   /* --- T2 ---
@@ -176,47 +210,58 @@ object OctreeUtils {
   *   em partições maiores do que deviam.
   * */
 
-  //Cria um octree sem especificar o tamanho da root
+  //Cria um octree sem especificar o tamanho da root (Tem como root o cubo que limita o espaço)
   def createTree(shapeList: List[Shape3D]): Octree[Placement] = createTree(shapeList, ((16.0, 16.0, 16.0), 32))
-
+  var teste = 0
   def createTree(shapeList: List[Shape3D], root: Placement): Octree[Placement] = {
     val size = root._2
     val emptyOcNode = new OcNode[Placement](((0.0, 0.0, 0.0), size / 2), OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
-    val corners = createCorners(root)
+    val partitionsOrigins = createOrigins(root)
 
     //Para cada partição ver se se existe alguma figura que esteja contida na mesma
-    def iterateThroughCorners(tree: Octree[Placement], corners: List[Point], i: Int, stop: Int): Octree[Placement] = {
+    def iterateThroughPartitions(tree: Octree[Placement], partitions: List[Point], i: Int, stop: Int): Octree[Placement] = {
       if (i > stop)
         return tree
 
-      val partition = createWiredBox(corners(i), size / 2)
+      val partition = createWiredBox(partitions(i), size / 2)
 
       (shapeList foldRight List[Shape3D]()) ((h, t) => {
 
+        //Este if pode estragar o algoritmo
         if (partition.getBoundsInParent.contains(h.getBoundsInParent)) {
 
           //Se puder ser dividida em ainda mais partições, criar um node, que representa um novo ramo
-          if (canBeDivided((corners(i), size / 2), h)) {
-            val node = createTree(shapeList, (corners(i), size / 2))
+          if (canBeDivided((partitions(i), size / 2), h)) {
+//            if (canBeDivided2((partitions(i), size / 2), h)) {
+            teste += 1
+            println(s"CanBeDivided verdadeiro: $teste para partição de tamanho ${size/2}")
+            val node = createTree(shapeList, (partitions(i), size / 2))
             val finalTree = putElementAt(tree, node, i).asInstanceOf[OcNode[Placement]]
-            return iterateThroughCorners(finalTree, corners, i + 1, stop)
+            //Iterar para a próxima partição
+            return iterateThroughPartitions(finalTree, partitions, i + 1, stop)
 
             //Se não puder ser dividida
             //Se nessa partição já existir uma leaf, adicionar o novo objeto à leaf
           } else tree.asInstanceOf[OcNode[Placement]].productElement(i) match {
             case value: OcLeaf[Placement, Section] =>
-
               val list = value.section._2
+
+              val shape = shapeInTheRightPosition(h, partition)
+
               //retorna uma nova árvore com a lista atualizada e o elemento, mais a partição, no seu sitio
-              val finalTree = putElementAt(tree, new OcLeaf[Placement, Section]((corners(i), size / 2), list :+ h :+ partition), i).asInstanceOf[OcNode[Placement]]
-              return iterateThroughCorners(finalTree, corners, i + 1, stop)
+//              val finalTree = putElementAt(tree, new OcLeaf[Placement, Section]((partitions(i), size / 2), list :+ h :+ partition), i).asInstanceOf[OcNode[Placement]]
+              val finalTree = putElementAt(tree, new OcLeaf[Placement, Section]((partitions(i), size / 2), list :+ shape :+ partition), i).asInstanceOf[OcNode[Placement]]
+              //Iterar para a próxima partição
+              return iterateThroughPartitions(finalTree, partitions, i + 1, stop)
 
             //Se não existir uma leaf ainda, fazer uma nova
             case _ =>
 
               //retorna uma nova árvore com a lista com o elemento e a partição no seu sitio
-              val finalTree = putElementAt(tree, new OcLeaf[Placement, Section]((corners(i), size / 2), List(h, partition)), i).asInstanceOf[OcNode[Placement]]
-              return iterateThroughCorners(finalTree, corners, i + 1, stop)
+              val finalTree = putElementAt(tree,
+                new OcLeaf[Placement, Section]((partitions(i), size / 2), List(h, partition)), i).asInstanceOf[OcNode[Placement]]
+              //Iterar para a próxima partição
+              return iterateThroughPartitions(finalTree, partitions, i + 1, stop)
 
           }
 
@@ -225,10 +270,10 @@ object OctreeUtils {
         t
       })
 
-      iterateThroughCorners(tree, corners, i + 1, stop)
+      iterateThroughPartitions(tree, partitions, i + 1, stop)
     }
     //Começar a iterar sobre as partições com uma nova árvore vazia
-    iterateThroughCorners(emptyOcNode, corners, 0, corners.size - 1)
+    iterateThroughPartitions(emptyOcNode, partitionsOrigins, 0, partitionsOrigins.size - 1)
   }
 
 
@@ -297,12 +342,36 @@ object OctreeUtils {
 
   // Tinham como objetivo auxiliar a implementação do algoritmo apresentado no Anexo I
 
+
+
+
+
+
   /*
 * Se o shape intersetar essa partição, criar um objeto que fica com a mesma origem
 *   que a partição e de seguida verificar se na mesma o shape não está contido. Caso sim,
 *   retornar esse shape, caso contrário devolver o original
 * */
   def transformShape(partition: Shape3D, s: Shape3D): Shape3D = {
+    if (s.getBoundsInParent.intersects(partition.getBoundsInParent)) {
+      val x = partition.getTranslateX.toInt
+      val y = partition.getTranslateY.toInt
+      val z = partition.getTranslateZ.toInt
+      val difColor = s.getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor
+      val color = ((difColor.getRed * 255.0).toInt, (difColor.getGreen * 255.0).toInt, (difColor.getBlue * 255.0).toInt)
+      if (s.toString.contains("Cylinder")) {
+        val newShape = GraphicModelConstructor.createShape("Cylinder", color, (x, y, z), (s.getScaleX, s.getScaleY, s.getScaleZ))
+        if (partition.getBoundsInParent.contains(newShape.getBoundsInParent)) return newShape
+      }
+      if (s.toString.contains("Box")) {
+        val newShape = GraphicModelConstructor.createShape("Box", color, (x, y, z), (s.getScaleX, s.getScaleY, s.getScaleZ))
+        if (partition.getBoundsInParent.contains(newShape.getBoundsInParent)) return newShape
+      }
+    }
+    s
+  }
+  //Fazer com um case
+  def transformShape2(partition: Shape3D, s: Shape3D): Shape3D = {
     if (s.getBoundsInParent.intersects(partition.getBoundsInParent)) {
       val x = partition.getTranslateX.toInt
       val y = partition.getTranslateY.toInt
@@ -327,7 +396,7 @@ object OctreeUtils {
 *   retornar true, caso contrário false
 * */
   def canBeTransformed(node: Placement, s: Shape3D, worldRoot: Group): Boolean = {
-    val corners = createCorners(node)
+    val corners = createOrigins(node)
     (corners foldRight false) ((h, t) => {
       val partition = createWiredBox(h, node._2 / 2)
       if (s.getBoundsInParent.intersects(partition.getBoundsInParent)) {

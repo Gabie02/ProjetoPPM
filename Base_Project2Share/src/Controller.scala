@@ -1,4 +1,4 @@
-import IO_Utils.oct
+//import IO_Utils.oct
 import OctreeUtils.mapColourEffect
 import javafx.fxml.FXML
 import javafx.scene.control.{Button, RadioButton, ToggleButton, ToggleGroup}
@@ -42,14 +42,14 @@ class Controller {
     subScene1.heightProperty.bind(anchorPane1.heightProperty)
     subScene1.setRoot(InitSubScene.root)
 
-
+//    IO_Utils
     //    InitSubScene.worldRoot.getChildren.add(OctreeUtils.SPACE_LIMIT)
-    OctreeUtils.addOctreeToWorldRoot(IO_Utils.oct, InitSubScene.worldRoot)
+    OctreeUtils.addOctreeToWorldRoot(IO_Utils.x, InitSubScene.worldRoot)
   }
     def onButtonClicked_color():Unit = {
 
-      if (button_sepia.isSelected) OctreeUtils.mapColourEffect(c => OctreeUtils.sepiaEffect(c))(IO_Utils.oct)
-      else if (button_greenRemove.isSelected) OctreeUtils.mapColourEffect(c => OctreeUtils.greenRemove(c))(IO_Utils.oct)
+      if (button_sepia.isSelected) OctreeUtils.mapColourEffect(c => OctreeUtils.sepiaEffect(c))(IO_Utils.x)
+      else if (button_greenRemove.isSelected) OctreeUtils.mapColourEffect(c => OctreeUtils.greenRemove(c))(IO_Utils.x)
     }
 
   //def onButtonClicked_scale(): Octree[((Double, Double, Double), OctreeUtils.Size)] = {
@@ -63,8 +63,8 @@ class Controller {
     //println("Botao 0.5: " + button_fator05.isSelected.toString)
     //println("Botao 2: " + button_fator2.isSelected.toString)
 
-    if (button_fator2.isSelected) OctreeUtils.scaleOctree(2, IO_Utils.oct)
-    else if(button_fator05.isSelected) OctreeUtils.scaleOctree(0.5, IO_Utils.oct)
+    if (button_fator2.isSelected) OctreeUtils.scaleOctree(2, IO_Utils.x)
+    else if(button_fator05.isSelected) OctreeUtils.scaleOctree(0.5, IO_Utils.x)
 
   }
 

@@ -5,9 +5,11 @@ import scala.io.StdIn.readLine
 import scala.util.{Failure, Success, Try}
 
 
-object IO_Utils {
+object IO_Utils extends App {
 
-  val oct = IO_Utils.getFile
+//  val oct = IO_Utils.getFile
+  val x = mainLoop(getFile)
+  FxApp.main(args)
 
   def showPrompt(): Unit = {
     println("-- Options --" +
@@ -28,8 +30,8 @@ object IO_Utils {
     shapes match {
       case Success(s) =>
         println("Ficheiro lido com sucesso!")
-        val oct1 = OctreeUtils.createTree(s)
-        mainLoop(oct1)
+        OctreeUtils.createTree(s)
+//        val x = mainLoop(oct1)
       /* Guardar ficheiro em algum lado */
       case Failure(e) => e match {
         case _:FileNotFoundException => println("Ficheiro não encontrado. Selecione outro."); getFile
@@ -73,7 +75,7 @@ object IO_Utils {
     }
   }
 
-  def main(args: Array[String]): Unit = {
-    FxApp.main(args)
-  }
+//  def main(args: Array[String]): Unit = {
+//
+//  }
 }

@@ -1,6 +1,6 @@
 import javafx.scene.{Group, Node}
 import javafx.scene.paint.{Color, PhongMaterial}
-import javafx.scene.shape.{Box, Cylinder, DrawMode, Shape3D}
+import javafx.scene.shape.{Box, DrawMode, Shape3D}
 
 import scala.annotation.tailrec
 
@@ -336,88 +336,5 @@ object OctreeUtils {
     iterate(root, 0, inputSize - 1)
   }
 
-  // ------- // --- Funções sem utilidade --- // ------- //
-
-  // Tinham como objetivo auxiliar a implementação do algoritmo apresentado no Anexo I
-
-
-
-
-
-
-  /*
-* Se o shape intersetar essa partição, criar um objeto que fica com a mesma origem
-*   que a partição e de seguida verificar se na mesma o shape não está contido. Caso sim,
-*   retornar esse shape, caso contrário devolver o original
-* */
-  def transformShape(partition: Shape3D, s: Shape3D): Shape3D = {
-    if (s.getBoundsInParent.intersects(partition.getBoundsInParent)) {
-      val x = partition.getTranslateX.toInt
-      val y = partition.getTranslateY.toInt
-      val z = partition.getTranslateZ.toInt
-      val difColor = s.getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor
-      val color = ((difColor.getRed * 255.0).toInt, (difColor.getGreen * 255.0).toInt, (difColor.getBlue * 255.0).toInt)
-      if (s.toString.contains("Cylinder")) {
-        val newShape = GraphicModelConstructor.createShape("Cylinder", color, (x, y, z), (s.getScaleX, s.getScaleY, s.getScaleZ))
-        if (partition.getBoundsInParent.contains(newShape.getBoundsInParent)) return newShape
-      }
-      if (s.toString.contains("Box")) {
-        val newShape = GraphicModelConstructor.createShape("Box", color, (x, y, z), (s.getScaleX, s.getScaleY, s.getScaleZ))
-        if (partition.getBoundsInParent.contains(newShape.getBoundsInParent)) return newShape
-      }
-    }
-    s
-  }
-  //Fazer com um case
-  def transformShape2(partition: Shape3D, s: Shape3D): Shape3D = {
-    if (s.getBoundsInParent.intersects(partition.getBoundsInParent)) {
-      val x = partition.getTranslateX.toInt
-      val y = partition.getTranslateY.toInt
-      val z = partition.getTranslateZ.toInt
-      val difColor = s.getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor
-      val color = ((difColor.getRed * 255.0).toInt, (difColor.getGreen * 255.0).toInt, (difColor.getBlue * 255.0).toInt)
-      if (s.toString.contains("Cylinder")) {
-        val newShape = GraphicModelConstructor.createShape("Cylinder", color, (x, y, z), (s.getScaleX, s.getScaleY, s.getScaleZ))
-        if (partition.getBoundsInParent.contains(newShape.getBoundsInParent)) return newShape
-      }
-      if (s.toString.contains("Box")) {
-        val newShape = GraphicModelConstructor.createShape("Box", color, (x, y, z), (s.getScaleX, s.getScaleY, s.getScaleZ))
-        if (partition.getBoundsInParent.contains(newShape.getBoundsInParent)) return newShape
-      }
-    }
-    s
-  }
-
-  /*
-* Se o shape intersetar essa partição, criar um objeto que fica com a mesma origem
-*   que a partição e de seguida verificar se na mesma o shape não está contido. Caso sim,
-*   retornar true, caso contrário false
-* */
-  def canBeTransformed(node: Placement, s: Shape3D, worldRoot: Group): Boolean = {
-    val corners = createOrigins(node)
-    (corners foldRight false) ((h, t) => {
-      val partition = createWiredBox(h, node._2 / 2)
-      if (s.getBoundsInParent.intersects(partition.getBoundsInParent)) {
-        val x = partition.getTranslateX.toInt
-        val y = partition.getTranslateY.toInt
-        val z = partition.getTranslateZ.toInt
-        val difColor = s.getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor
-        val color = ((difColor.getRed * 255.0).toInt, (difColor.getGreen * 255.0).toInt, (difColor.getBlue * 255.0).toInt)
-        if (s.toString.contains("Cylinder")) {
-          val newShape = GraphicModelConstructor.createShape("Cylinder", color, (x, y, z), (s.getScaleX, s.getScaleY, s.getScaleZ))
-          if (partition.getBoundsInParent.contains(newShape.getBoundsInParent)) worldRoot.getChildren.add(newShape)
-          return true
-        }
-        if (s.toString.contains("Box")) {
-          val newShape = GraphicModelConstructor.createShape("Box", color, (x, y, z), (s.getScaleX, s.getScaleY, s.getScaleZ))
-          if (partition.getBoundsInParent.contains(newShape.getBoundsInParent)) worldRoot.getChildren.add(newShape)
-          return true
-        }
-      }
-      t
-    })
-  }
-
-  // ------- // ------ // ------- // ------ // ------- //
 }
 

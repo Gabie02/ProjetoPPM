@@ -55,24 +55,6 @@
                   </AnchorPane>
             </content>
           </TitledPane>
-          <TitledPane animated="false" text="Visibilidade da OcTree">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <Label layoutY="4.0" prefHeight="20.0" prefWidth="165.0" text="Fazer a OcTree visível">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                        </Label>
-                        <ToggleButton fx:id="button_visible" layoutX="14.0" layoutY="54.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="97.0" style="-fx-background-color: Green;" text="Visível">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </ToggleButton>
-                     </children>
-                  </AnchorPane>
-            </content>
-          </TitledPane>
         </panes>
       </Accordion>
     <AnchorPane fx:id="anchorPane1" minHeight="0.0" minWidth="0.0" prefHeight="798.0" prefWidth="610.0">

@@ -18,8 +18,6 @@ class Controller {
   @FXML
   private var button_scale : Button = _
   @FXML
-  private var button_visible : ToggleButton = _
-  @FXML
   private var button_sepia : RadioButton = _
   @FXML
   private var button_greenRemove : RadioButton = _
@@ -53,8 +51,5 @@ class Controller {
     else if(button_fator05.isSelected) OctreeUtils.scaleOctree(0.5, IO_Utils.x)
   }
 
-    //def onButtonClicked_visible():Unit = {
-
-    //}
 
 }

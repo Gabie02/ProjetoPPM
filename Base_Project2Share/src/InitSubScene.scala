@@ -97,7 +97,7 @@ object InitSubScene{
 
   // ---T3---
   //Quando se muda a visualização e movimento da camera, as partiçoes que estão dentro da camera de visualização, mudam de cor (verde neste caso)
-  root.setOnMouseClicked(event => { event.getButton() match {
+  subScene.setOnMouseClicked(event => { event.getButton() match {
     case MouseButton.PRIMARY => OctreeUtils.intersectsCamera(IO_Utils.x, camVolume)
     case _ =>
   }})

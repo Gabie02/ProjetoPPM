@@ -32,82 +32,20 @@ object OctreeUtils {
 
   //  --- T4 ---
   def scaleOctree(fact: Double, oct: Octree[Placement]): Octree[Placement] = fact match {
-    case 0.5 | 2 => auxScale2(fact, oct)
+    case 0.5 | 2 => auxScale(fact, oct)
     case _ => println("--> Fator inválido!!!"); throw new IllegalArgumentException("Argumento inválido: Não foi possível efetuar scale, factor inválido ")
   }
 
+
   def auxScale(fact: Double, oct: Octree[Placement]): Octree[Placement] = {
-
-    val root = oct.asInstanceOf[OcNode[Placement]]
-
-    val list_Ocnodes = createAttributesList(root)
-
-    list_Ocnodes.foldRight()((h, _) => {
-      h match {
-        case _: OcNode[Placement] =>
-          auxScale(fact, h)
-        case _: OcLeaf[Placement, Section] =>
-          val shapeList = h.asInstanceOf[OcLeaf[Placement, Section]].section._2
-          (shapeList foldRight List[Node]()) ((h, t) => {
-            //println("Shape before: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
-            h match {
-              case _: Box =>
-                val box = h.asInstanceOf[Box]
-                //                println("BOX" + box.getWidth/2)
-                //                println("PARENT" + box.getBoundsInParent.getWidth/2)
-                //                println(h.getBoundsInParent.getCenterX + " " + h.getBoundsInParent.getCenterY + " " + h.getBoundsInParent.getCenterZ)
-                //                println(h.getTranslateX + " " + h.getTranslateY + " " + h.getTranslateZ)
-                if (box.getDrawMode == DrawMode.LINE)
-                  println(s"Caixa $box é uma wiredBox")
-                val movement = box.getWidth / 2 * fact
-                shapeList.foreach( s => if(s != h) println("Antes de " + s + " fazer translate: " + s.getTranslateX + " " + s.getTranslateY + " " + s.getTranslateZ))
-                translate(shapeList, movement, h)
-                shapeList.foreach( s => if(s != h) println("Resultado da função translate para " + s + ": " + s.getTranslateX + " " + s.getTranslateY + " " + s.getTranslateZ))
-
-              //                h.setTranslateX(box.getBoundsInParent.getCenterX + movement)
-              //                h.setTranslateY(box.getBoundsInParent.getCenterY + movement)
-              //                h.setTranslateZ(box.getBoundsInParent.getCenterZ + movement)
-
-              case _: Cylinder =>
-                val cylinder = h.asInstanceOf[Cylinder]
-                println("Cylinder" + cylinder.getRadius)
-
-            }
-            //val movement = h.getBoundsInParent.getWidth /2
-            //println(movement)
-            //println("A" + h.getLayoutBounds.getCenterX + " " + movement)
-            //h.setTranslateX(h.getBoundsInParent.getCenterX + movement)
-            //h.setTranslateY(h.getBoundsInParent.getCenterY + movement)
-            //h.setTranslateZ(h.getBoundsInParent.getCenterZ + movement)
-            println("Centro antes do scale: " + h.getTranslateX + " " + h.getTranslateY + " " + h.getTranslateZ)
-            h.setScaleX(h.getScaleX * fact)
-            h.setScaleY(h.getScaleY * fact)
-            h.setScaleZ(h.getScaleZ * fact)
-            println("Centro depois do scale: " + h.getTranslateX + " " + h.getTranslateY + " " + h.getTranslateZ)
-
-            t
-            //println("Shape after: " + h.getScaleX + " " + h.getScaleY + " " + h.getScaleZ)
-          })
-        case _ =>
-      }
-    })
-    root
-
-  }
-
-  def auxScale2(fact: Double, oct: Octree[Placement]): Octree[Placement] = {
     val listaDeShapes = getAllShapes(oct)
-    println(listaDeShapes)
     (listaDeShapes foldRight ())((h,_) => {
-      val movement = h.getBoundsInParent.getWidth / 2 * fact
-      println(s"Chamar função translate com $movement ao centro")
-      translate(listaDeShapes, movement, h)
-      listaDeShapes.foreach( s => if(s != h) println("Resultado da função translate para " + s + ": " + s.getTranslateX + " " + s.getTranslateY + " " + s.getTranslateZ))
-      println("Centro antes do scale: " + h.getTranslateX + " " + h.getTranslateY + " " + h.getTranslateZ)
+      h.setTranslateX(h.getBoundsInParent.getCenterX * fact)
+      h.setTranslateY(h.getBoundsInParent.getCenterY * fact)
+      h.setTranslateZ(h.getBoundsInParent.getCenterZ * fact)
       h.setScaleX(h.getScaleX * fact)
       h.setScaleY(h.getScaleY * fact)
       h.setScaleZ(h.getScaleZ * fact)
-      println("Centro depois do scale: " + h.getTranslateX + " " + h.getTranslateY + " " + h.getTranslateZ)
     })
     oct
   }

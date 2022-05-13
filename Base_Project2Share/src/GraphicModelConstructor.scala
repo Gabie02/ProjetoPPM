@@ -79,11 +79,19 @@ object GraphicModelConstructor {
       h match {
         case _: Box =>
           val box = h.asInstanceOf[Box]
-          pw.write("Box" + " " + "(" + (box.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor.getRed * 255).toInt + "," + (box.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor.getGreen * 255).toInt + "," + (box.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor.getBlue * 255).toInt + ")" + " " + box.getTranslateX.toInt + " " + box.getTranslateY.toInt + " " + box.getTranslateZ.toInt + " " + box.getScaleX + " " + box.getScaleY + " " + box.getScaleZ + "\n")
+          pw.write("Box" + " " + "(" + (box.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor.getRed * 255).toInt + ","
+            + (box.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor.getGreen * 255).toInt + ","
+            + (box.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor.getBlue * 255).toInt + ")"
+            + " " + box.getTranslateX.toInt + " " + box.getTranslateY.toInt + " " + box.getTranslateZ.toInt + " "
+            + box.getScaleX + " " + box.getScaleY + " " + box.getScaleZ + "\n")
 
         case _: Cylinder =>
           val cylinder = h.asInstanceOf[Cylinder]
-          pw.write("Cylinder" + " " + "(" + (cylinder.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor.getRed * 255).toInt + "," + (cylinder.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor.getGreen * 255).toInt + "," + (cylinder.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor.getBlue * 255).toInt + ")" + " " + cylinder.getTranslateX.toInt + " " + cylinder.getTranslateY.toInt + " " + cylinder.getTranslateZ.toInt + " " + cylinder.getScaleX + " " + cylinder.getScaleY + " " + cylinder.getScaleZ + "\n")
+          pw.write("Cylinder" + " " + "(" + (cylinder.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor.getRed * 255).toInt
+            + "," + (cylinder.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor.getGreen * 255).toInt + ","
+            + (cylinder.asInstanceOf[Shape3D].getMaterial.asInstanceOf[PhongMaterial].getDiffuseColor.getBlue * 255).toInt + ")"
+            + " " + cylinder.getTranslateX.toInt + " " + cylinder.getTranslateY.toInt + " " + cylinder.getTranslateZ.toInt + " "
+            + cylinder.getScaleX + " " + cylinder.getScaleY + " " + cylinder.getScaleZ + "\n")
 
         case _ =>
       }

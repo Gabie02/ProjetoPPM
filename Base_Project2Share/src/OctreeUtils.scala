@@ -17,15 +17,17 @@ object OctreeUtils {
     (p1._1 + p2._1, p1._2 + p2._2, p1._3 + p2._3)
   }
 
-  def getAllShapes(oct: Octree[Placement]):List[Shape3D] = oct match {
-    case n: OcNode[Placement] =>
-      val atributos = createAttributesList(n)
-      (atributos foldRight List[Shape3D]()) ((h, t) => {
-        getAllShapes(h)++t
-      })
-    case l: OcLeaf[Placement, Section] =>
-      l.section._2.asInstanceOf[List[Shape3D]]
-    case _ => List[Shape3D]()
+  def getAllShapes(oct: Octree[Placement]): List[Shape3D] = {
+    oct match {
+      case n: OcNode[Placement] =>
+        val atributos = createAttributesList(n)
+        (atributos foldRight List[Shape3D]()) ((h, t) => {
+          getAllShapes(h) ++ t
+        })
+      case l: OcLeaf[Placement, Section] =>
+        l.section._2.asInstanceOf[List[Shape3D]]
+      case _ => List[Shape3D]()
+    }
   }
 
   //Devolve os todos os atributos de um node, exceto o primeiro, que é o placement
@@ -40,22 +42,11 @@ object OctreeUtils {
 
     iterate(e, List[Octree[Placement]](), 1)
   }
-  //Adiciona a tree à WorldRoot
-  def addOctreeToWorldRoot(oct: Octree[Placement], worldRoot: Group): Unit = oct match {
-    case n: OcNode[Placement] =>
-      val atributos = createAttributesList(n)
-      (atributos foldRight()) ((h, t) => {
-        addOctreeToWorldRoot(h, worldRoot)
-        t
-      })
-    case l: OcLeaf[Placement, Section] =>
-      val listShapes = l.section._2
 
-      (listShapes foldRight()) ((h, t) => {
-        worldRoot.getChildren.add(h)
-        t
-      })
-    case _ =>
+  //Adiciona a tree à WorldRoot
+  def addOctreeToWorldRoot(oct: Octree[Placement], worldRoot: Group): Unit = {
+    val shapes = getAllShapes(oct)
+    (shapes foldRight())((h,_) => worldRoot.getChildren.add(h))
   }
   //T2 Auxiliary functions
 
@@ -66,7 +57,7 @@ object OctreeUtils {
     box.setTranslateY(origin._2)
     box.setTranslateZ(origin._3)
     val redMaterial = new PhongMaterial()
-    redMaterial.setDiffuseColor(Color.rgb(150,0,0))
+    redMaterial.setDiffuseColor(Color.rgb(150, 0, 0))
     box.setMaterial(redMaterial)
     box.setDrawMode(DrawMode.LINE)
     box
@@ -113,22 +104,21 @@ object OctreeUtils {
   }
 
   // --- T2 ---
-  //Cria um octree (Tem como root default o cubo que limita o espaço)
-  def createTree(shapeList: List[Shape3D], root: Placement = ((16.0, 16.0, 16.0), 32)): Octree[Placement] = {
+  //Cria um octree (Tem como root default o cubo que limita o espaço, profundidade de 16 e tamanho minimo para cada partição de 1)
+  def createTree(shapeList: List[Shape3D], root: Placement = ((16.0, 16.0, 16.0), 32), depthLimit: Int = 16, smallestPartitionSize: Size = 1): Octree[Placement] = {
     val size = root._2
     val emptyOcNode = new OcNode[Placement](((0.0, 0.0, 0.0), size / 2), OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty, OcEmpty)
     val partitionsOrigins = createOrigins(root)
 
     //Para cada partição ver se se existe alguma figura que esteja contida na mesma
-    def iterateThroughPartitions(tree: Octree[Placement], partitions: List[Point], i: Int, stop: Int): Octree[Placement] = {
-      if (i > stop)
+    def iterateThroughPartitions(tree: Octree[Placement], partitions: List[Point], i: Int, stop: Int, depth: Int): Octree[Placement] = {
+      if (i > stop || root._2 == smallestPartitionSize || depth <= 0)
         return tree
 
       val partition = createWiredBox(partitions(i), size / 2)
 
       (shapeList foldRight List[Shape3D]()) ((h, t) => {
 
-        //Este if pode estragar o algoritmo
         if (partition.getBoundsInParent.contains(h.getBoundsInParent)) {
 
           //Se puder ser dividida em ainda mais partições, criar um node, que representa um novo ramo
@@ -136,19 +126,20 @@ object OctreeUtils {
 
             val node = createTree(shapeList, (partitions(i), size / 2))
             val finalTree = putElementAt(tree, node, i).asInstanceOf[OcNode[Placement]]
+
             //Iterar para a próxima partição
-            return iterateThroughPartitions(finalTree, partitions, i + 1, stop)
+            return iterateThroughPartitions(finalTree, partitions, i + 1, stop, depth - 1)
 
             //Se não puder ser dividida
             //Se nessa partição já existir uma leaf, adicionar o novo objeto à leaf
-          } else tree.asInstanceOf[OcNode[Placement]].productElement(i) match {
+          } else tree.asInstanceOf[OcNode[Placement]].productElement(i + 1) match {
             case value: OcLeaf[Placement, Section] =>
               val list = value.section._2
 
               //retorna uma nova árvore com a lista atualizada e o elemento, mais a partição, no seu sitio
               val finalTree = putElementAt(tree, new OcLeaf[Placement, Section]((partitions(i), size / 2), list :+ h :+ partition), i).asInstanceOf[OcNode[Placement]]
               //Iterar para a próxima partição
-              return iterateThroughPartitions(finalTree, partitions, i + 1, stop)
+              return iterateThroughPartitions(finalTree, partitions, i + 1, stop, depth)
 
             //Se não existir uma leaf ainda, fazer uma nova
             case _ =>
@@ -157,34 +148,33 @@ object OctreeUtils {
               val finalTree = putElementAt(tree,
                 new OcLeaf[Placement, Section]((partitions(i), size / 2), List(h, partition)), i).asInstanceOf[OcNode[Placement]]
               //Iterar para a próxima partição
-              return iterateThroughPartitions(finalTree, partitions, i + 1, stop)
+              return iterateThroughPartitions(finalTree, partitions, i + 1, stop, depth)
           }
         }
         //Repetir o processo com o seguinte shape
         t
       })
 
-      iterateThroughPartitions(tree, partitions, i + 1, stop)
+      iterateThroughPartitions(tree, partitions, i + 1, stop, depth)
     }
     //Começar a iterar sobre as partições com uma nova árvore vazia
-    iterateThroughPartitions(emptyOcNode, partitionsOrigins, 0, partitionsOrigins.size - 1)
+    iterateThroughPartitions(emptyOcNode, partitionsOrigins, 0, partitionsOrigins.size - 1, depthLimit)
   }
 
   //  --- T3 ---
-  def intersectsCamera(oct:Octree[Placement], camVolume: Cylinder):Unit = {
+  def intersectsCamera(oct: Octree[Placement], camVolume: Cylinder): Unit = {
     oct match {
       // Se for um ocNode
       case _: OcNode[Placement] =>
-        //println("SOU UM NODE")
         val ocnode = oct.asInstanceOf[OcNode[Placement]]
         val atribList = OctreeUtils.createAttributesList(ocnode)
-        (atribList foldRight List[Octree[Placement]]()) ((h,t) => {
-          intersectsCamera(h, camVolume); t
+        (atribList foldRight List[Octree[Placement]]()) ((h, t) => {
+          intersectsCamera(h, camVolume);
+          t
         })
 
       // Se for uma ocLeaf
       case _: OcLeaf[Placement, Section] =>
-        //println("SOU UMA LEAF")
         val ocleaf = oct.asInstanceOf[OcLeaf[Placement, Section]]
         val listaSection = ocleaf.section._2
         // Se a lista de nodes da section nao estiver vazia
@@ -192,7 +182,7 @@ object OctreeUtils {
           h.asInstanceOf[Shape3D]
           h match {
             case box: Box =>
-              //Verifica se é uma wiredBox?
+              // Verifica se é uma wiredBox
               if (box.getDrawMode.equals(DrawMode.LINE)) {
                 // Se intersetar
                 if (camVolume.asInstanceOf[Shape3D].getBoundsInParent.intersects(box.getBoundsInParent)) {
@@ -219,7 +209,7 @@ object OctreeUtils {
     case 0.5 | 2 =>
       val listaDeShapes = getAllShapes(oct)
 
-      (listaDeShapes foldRight ())((h,_) => {
+      (listaDeShapes foldRight()) ((h, _) => {
 
         h.setTranslateZ(h.getTranslateZ * fact)
         h.setTranslateX(h.getTranslateX * fact)

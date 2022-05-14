@@ -10,13 +10,7 @@ class Controller {
   @FXML
   private var subScene1:SubScene = _
   @FXML
-  private var gridPane1:GridPane = _
-  @FXML
   private var anchorPane1:AnchorPane = _
-  @FXML
-  private var button_color : Button = _
-  @FXML
-  private var button_scale : Button = _
   @FXML
   private var button_sepia : RadioButton = _
   @FXML
@@ -25,6 +19,7 @@ class Controller {
   private var button_fator2 : RadioButton = _
   @FXML
   private var button_fator05 : RadioButton = _
+
 
   //  --- T7 ---
   @FXML
@@ -35,21 +30,28 @@ class Controller {
     subScene1.heightProperty.bind(anchorPane1.heightProperty)
     subScene1.setRoot(InitSubScene.root)
 
-//    IO_Utils
-    //    InitSubScene.worldRoot.getChildren.add(OctreeUtils.SPACE_LIMIT)
-    OctreeUtils.addOctreeToWorldRoot(IO_Utils.x, InitSubScene.worldRoot)
+    OctreeUtils.addOctreeToWorldRoot(IO_Utils.OcTree, InitSubScene.worldRoot)
   }
     def onButtonClicked_color():Unit = {
 
-      if (button_sepia.isSelected) OctreeUtils.mapColourEffect(c => OctreeUtils.sepiaEffect(c))(IO_Utils.x)
-      else if (button_greenRemove.isSelected) OctreeUtils.mapColourEffect(c => OctreeUtils.greenRemove(c))(IO_Utils.x)
+      if (button_sepia.isSelected) OctreeUtils.mapColourEffect(c => OctreeUtils.sepiaEffect(c))(IO_Utils.OcTree)
+      else if (button_greenRemove.isSelected) OctreeUtils.mapColourEffect(c => OctreeUtils.greenRemove(c))(IO_Utils.OcTree)
     }
 
   def onButtonClicked_scale():Unit = {
 
-    if (button_fator2.isSelected) OctreeUtils.scaleOctree(2, IO_Utils.x)
-    else if(button_fator05.isSelected) OctreeUtils.scaleOctree(0.5, IO_Utils.x)
+    if (button_fator2.isSelected) OctreeUtils.scaleOctree(2, IO_Utils.OcTree)
+    else if(button_fator05.isSelected) OctreeUtils.scaleOctree(0.5, IO_Utils.OcTree)
   }
 
+//
+//  def onButtenClicked_chooseFile():Unit = {
+//    import javafx.stage.FileChooser
+//    val fileChooser = new FileChooser
+//    fileChooser.setTitle("Open Resource File")
+//    fileChooser.getExtensionFilters.addAll(new Nothing("Text Files", "*.txt"), new Nothing("Image Files", "*.png", "*.jpg", "*.gif"), new Nothing("Audio Files", "*.wav", "*.mp3", "*.aac"), new Nothing("All Files", "*.*"))
+//    val selectedFile = fileChooser.showOpenDialog()
+//    if (selectedFile != null) mainStage.display(selectedFile)
+//  }
 
 }

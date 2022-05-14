@@ -1,24 +1,24 @@
-import OctreeUtils.Placement
+import OctreeUtils.{Placement, createTree}
+
 import scala.annotation.tailrec
 import java.io.{FileNotFoundException, IOException}
 import scala.io.StdIn.readLine
 import scala.util.{Failure, Success, Try}
 
 
-
 object IO_Utils extends App {
 
-  //HELLOOOOO
-  val x = mainLoop(getFile)
+  val OcTree = mainLoop(loadFile)
   FxApp.main(args)
 
   //  --- T6 ---
   def showPrompt(): Unit = {
     println("-- Options --" +
       "\na) Escolher outro ficheiro de configuração " +
-      "\nb) Mudar a cor da Tree " +
-      "\nc) Mudar a escala da Tree" +
-      "\nd) Lançar ambiente 3D" +
+      "\nb) Carregar estado da última utilização" +
+      "\nc) Mudar a cor da Tree " +
+      "\nd) Mudar a escala da Tree" +
+      "\ne) Lançar ambiente 3D" +
       "\nOpção: ")
   }
 
@@ -35,15 +35,33 @@ object IO_Utils extends App {
         OctreeUtils.createTree(s)
 
       case Failure(e) => e match {
-        case _:FileNotFoundException => println("Ficheiro não encontrado. Selecione outro."); getFile
-        case e:IllegalArgumentException => println(e + " Selecione outro ficheiro."); getFile
-        case _:IOException => println("Ocorreu um erro a ler o ficheiro. Selecione outro."); getFile
+        case _: FileNotFoundException => println("Ficheiro não encontrado. Selecione outro."); getFile
+        case e: IllegalArgumentException => println(e + " Selecione outro ficheiro."); getFile
+        case _: IOException => println("Ocorreu um erro a ler o ficheiro. Selecione outro."); getFile
       }
     }
   }
 
+  def loadFile: Octree[Placement] = {
+    println("Pretende carregar um novo ficheiro ou o estado da última sessão?" +
+      "\na) Novo ficheiro" +
+      "\nb) Última sessão")
+    val option = getUserInput
+    option.toUpperCase match {
+      case "A" =>
+        getFile
+      case "B" =>
+        val shapes = GraphicModelConstructor.readFromFile("lastTree.txt")
+        shapes match {
+          case Nil => println("Não existe um última sessão, ou então não foi guardada."); loadFile
+          case _ => println("Última sessão carregada com sucesso! "); createTree(shapes)
+        }
+    }
+  }
+
+
   @tailrec
-  def mainLoop(oct:Octree[Placement]):Octree[Placement] = {
+  def mainLoop(oct: Octree[Placement]): Octree[Placement] = {
     showPrompt()
     val userInput = getUserInput
 
@@ -51,6 +69,9 @@ object IO_Utils extends App {
       case "A" =>
         getFile
       case "B" =>
+        val shapeList = GraphicModelConstructor.readFromFile("lastTree.txt")
+        mainLoop(createTree(shapeList))
+      case "C" =>
         println("Que efeito pretende aplicar?" +
           "\na) Remover verdes" +
           "\nb) Efeito sépia")
@@ -58,8 +79,7 @@ object IO_Utils extends App {
           case "A" => mainLoop(OctreeUtils.mapColourEffect(c => OctreeUtils.greenRemove(c))(oct))
           case "B" => mainLoop(OctreeUtils.mapColourEffect(c => OctreeUtils.sepiaEffect(c))(oct))
         }
-      case "C" =>
-        //Perguntar para selecionar a escala
+      case "D" =>
         println("Que escala pretende aplicar?" +
           "\na) Escala 2" +
           "\nb) Escala 0.5")
@@ -67,9 +87,9 @@ object IO_Utils extends App {
           case "A" => mainLoop(OctreeUtils.scaleOctree(2, oct))
           case "B" => mainLoop(OctreeUtils.scaleOctree(0.5, oct))
         }
-      case "D" => oct
-      case _  =>
-        println("Input Inválido! Escolher uma das opções")
+      case "E" => oct
+      case _ =>
+        println("Input Inválido! Escolher uma das opções (a, b, ...)")
         mainLoop(oct)
     }
   }

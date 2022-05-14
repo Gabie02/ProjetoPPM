@@ -21,14 +21,10 @@ object GraphicModelConstructor {
     if (bufferedSource.isEmpty)
       println("Ficheiro vazio!")
     for (line <- bufferedSource.getLines) {
-      shapes += convertShapes(line)
+      shapes += buildObject(line)
     }
     bufferedSource.close
     shapes.toList
-  }
-
-  private def convertShapes(line: String):Shape3D = {
-    GraphicModelConstructor.buildObject(line)
   }
 
   def buildObject(line: String): Shape3D = {

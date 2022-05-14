@@ -8,7 +8,7 @@ import scala.util.{Failure, Success, Try}
 
 object IO_Utils extends App {
 
-  val OcTree = mainLoop(loadFile)
+  var OcTree = mainLoop(loadFile)
   FxApp.main(args)
 
   //  --- T6 ---
@@ -44,6 +44,7 @@ object IO_Utils extends App {
     }
   }
 
+  @tailrec
   def loadFile: Octree[Placement] = {
     println("Pretende carregar um novo ficheiro ou o estado da última sessão?" +
       "\na) Novo ficheiro" +

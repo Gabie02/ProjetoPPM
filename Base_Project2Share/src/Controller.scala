@@ -28,7 +28,7 @@ class Controller {
   @FXML
   private var msg: Label = _
 
-  var Tree: Octree[Placement] = IO_Utils.OcTree
+  //var Tree: Octree[Placement] = IO_Utils.OcTree
 
 
   //  --- T7 ---
@@ -40,18 +40,18 @@ class Controller {
     subScene1.heightProperty.bind(anchorPane1.heightProperty)
     subScene1.setRoot(InitSubScene.root)
 
-    OctreeUtils.addOctreeToWorldRoot(Tree, InitSubScene.worldRoot)
+    OctreeUtils.addOctreeToWorldRoot(IO_Utils.OcTree, InitSubScene.worldRoot)
   }
     def onButtonClicked_color():Unit = {
 
-      if (button_sepia.isSelected) Tree = OctreeUtils.mapColourEffect(c => OctreeUtils.sepiaEffect(c))(Tree)
-      else if (button_greenRemove.isSelected) Tree = OctreeUtils.mapColourEffect(c => OctreeUtils.greenRemove(c))(Tree)
+      if (button_sepia.isSelected) IO_Utils.OcTree = OctreeUtils.mapColourEffect(c => OctreeUtils.sepiaEffect(c))(IO_Utils.OcTree)
+      else if (button_greenRemove.isSelected) IO_Utils.OcTree = OctreeUtils.mapColourEffect(c => OctreeUtils.greenRemove(c))(IO_Utils.OcTree)
     }
 
   def onButtonClicked_scale():Unit = {
 
-    if (button_fator2.isSelected) Tree = OctreeUtils.scaleOctree(2, Tree)
-    else if(button_fator05.isSelected) Tree = OctreeUtils.scaleOctree(0.5, Tree)
+    if (button_fator2.isSelected)  OctreeUtils.scaleOctree(2, IO_Utils.OcTree)
+    else if(button_fator05.isSelected)  OctreeUtils.scaleOctree(0.5, IO_Utils.OcTree)
   }
 
   def onButtenClicked_chooseFile():Unit = {
@@ -63,11 +63,11 @@ class Controller {
         msg.setText("Ficheiro carregado com sucesso!");
         msg.setVisible(true)
         //Remover tree anterior
-        val previousShapeList = OctreeUtils.getAllShapes(Tree)
+        val previousShapeList = OctreeUtils.getAllShapes(IO_Utils.OcTree)
         (previousShapeList foldRight()) ((h,_) => InitSubScene.worldRoot.getChildren.remove(h))
         //Adicionar a nova tree
-        Tree = createTree(s)
-        OctreeUtils.addOctreeToWorldRoot(Tree, InitSubScene.worldRoot)
+        IO_Utils.OcTree = createTree(s)
+        OctreeUtils.addOctreeToWorldRoot(IO_Utils.OcTree, InitSubScene.worldRoot)
         //Remover tree anterior da stage e adicionar a nova tree
 
       case Failure(e) => e match {
@@ -82,12 +82,12 @@ class Controller {
 
   def onButtenClicked_loadPreviousState(): Unit = {
     //Remover Tree
-    val previousShapeList = OctreeUtils.getAllShapes(Tree)
+    val previousShapeList = OctreeUtils.getAllShapes(IO_Utils.OcTree)
     (previousShapeList foldRight()) ((h,_) => InitSubScene.worldRoot.getChildren.remove(h))
     //Adicionar nova tree
     val shapeList = Try(GraphicModelConstructor.readFromFile("lastTree.txt")).get
-    Tree = createTree(shapeList)
-    OctreeUtils.addOctreeToWorldRoot(Tree, InitSubScene.worldRoot)
+    IO_Utils.OcTree = createTree(shapeList)
+    OctreeUtils.addOctreeToWorldRoot(IO_Utils.OcTree, InitSubScene.worldRoot)
   }
 
 }

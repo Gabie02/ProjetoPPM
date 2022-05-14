@@ -169,7 +169,7 @@ object OctreeUtils {
         val ocnode = oct.asInstanceOf[OcNode[Placement]]
         val atribList = OctreeUtils.createAttributesList(ocnode)
         (atribList foldRight List[Octree[Placement]]()) ((h, t) => {
-          intersectsCamera(h, camVolume);
+          intersectsCamera(h, camVolume)
           t
         })
 

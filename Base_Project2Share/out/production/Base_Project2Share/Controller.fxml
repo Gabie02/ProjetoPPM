@@ -13,48 +13,52 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.text.Font?>
 
-<SplitPane dividerPositions="0.26753507014028055" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+<SplitPane dividerPositions="0.26753507014028055" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
   <items>
-      <Accordion>
+      <Accordion prefHeight="698.0" prefWidth="243.0">
         <panes>
           <TitledPane animated="false" prefHeight="748.0" prefWidth="325.0" text="Mudar cor">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="244.0">
                      <children>
-                        <Label layoutY="4.0" prefHeight="20.0" prefWidth="165.0" text="Mudar a cor dos Objetos">
+                        <Label layoutX="50.0" layoutY="4.0" prefHeight="20.0" prefWidth="165.0" text="Mudar a cor dos Objetos">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <RadioButton fx:id="button_greenRemove" layoutX="188.0" layoutY="64.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="87.0" text="Remover cor verde" wrapText="true">
+                        <RadioButton fx:id="button_greenRemove" layoutX="105.0" layoutY="67.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="87.0" text="Remover cor verde" wrapText="true">
                            <toggleGroup>
                               <ToggleGroup fx:id="cor" />
                            </toggleGroup>
                         </RadioButton>
-                        <RadioButton fx:id="button_normalColor" layoutX="14.0" layoutY="64.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="87.0" selected="true" text="Cor normal" toggleGroup="$cor" wrapText="true" />
-                        <RadioButton fx:id="button_sepia" layoutX="101.0" layoutY="64.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="87.0" text="Efeito Sépia" toggleGroup="$cor" wrapText="true" />
+                        <RadioButton fx:id="button_sepia" layoutX="18.0" layoutY="67.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="87.0" selected="true" text="Efeito Sépia" toggleGroup="$cor" wrapText="true" />
                         <Button fx:id="button_color" layoutX="18.0" layoutY="105.0" mnemonicParsing="false" onMouseClicked="#onButtonClicked_color" text="Aplicar efeito de cor" />
+                        <Label layoutX="18.0" layoutY="48.0" text="Efeito de cor">
+                           <font>
+                              <Font size="13.0" />
+                           </font>
+                        </Label>
                      </children>
                   </AnchorPane>
             </content>
           </TitledPane>
-          <TitledPane animated="false" text="Mudar escala">
+          <TitledPane animated="false" prefHeight="648.0" prefWidth="245.0" text="Mudar escala">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Button fx:id="button_scale" layoutX="14.0" layoutY="117.0" mnemonicParsing="false" onMouseClicked="#onButtonClicked_scale" prefHeight="25.0" prefWidth="97.0" text="Aplicar escala" wrapText="true" />
-                        <Label layoutY="4.0" text="Mudar a escala dos objetos">
+                        <Button fx:id="button_scale" layoutX="11.0" layoutY="88.0" mnemonicParsing="false" onMouseClicked="#onButtonClicked_scale" prefHeight="25.0" prefWidth="97.0" text="Aplicar escala" wrapText="true" />
+                        <Label layoutX="45.0" layoutY="4.0" text="Mudar a escala dos objetos">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <RadioButton fx:id="button_fator05" layoutX="95.0" layoutY="80.0" mnemonicParsing="false" selected="true" text="Fator 0.5" wrapText="true">
+                        <RadioButton fx:id="button_fator05" layoutX="96.0" layoutY="57.0" mnemonicParsing="false" selected="true" text="Fator 0.5" wrapText="true">
                            <toggleGroup>
                               <ToggleGroup fx:id="scale" />
                            </toggleGroup>
                         </RadioButton>
-                        <RadioButton fx:id="button_fator2" layoutX="14.0" layoutY="80.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="76.0" selected="true" text="Fator 2" toggleGroup="$scale" />
-                        <Label layoutX="14.0" layoutY="48.0" text="Escala">
+                        <RadioButton fx:id="button_fator2" layoutX="11.0" layoutY="57.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="76.0" selected="true" text="Fator 2" toggleGroup="$scale" />
+                        <Label layoutX="14.0" layoutY="31.0" text="Escala">
                            <font>
                               <Font size="13.0" />
                            </font>
@@ -67,22 +71,24 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Label layoutY="4.0" text="Mudar Configuração do ambiente">
+                        <Label layoutX="22.0" layoutY="4.0" text="Mudar Configuração do ambiente">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <TextField layoutX="16.0" layoutY="88.0" promptText="exemplo.txt" />
-                        <Button layoutX="16.0" layoutY="154.0" mnemonicParsing="false" text="Carregar" />
-                        <Label layoutX="16.0" layoutY="131.0" text="Carregar última sessão" />
+                        <TextField fx:id="text_field" layoutX="16.0" layoutY="88.0" promptText="exemplo.txt" />
+                        <Button layoutX="16.0" layoutY="196.0" mnemonicParsing="false" onMouseClicked="#onButtenClicked_loadPreviousState" text="Carregar" />
+                        <Label layoutX="13.0" layoutY="167.0" text="Carregar última sessão" />
                         <Label layoutX="14.0" layoutY="57.0" prefHeight="25.0" prefWidth="225.0" text="Nome do ficheiro que pretende carregar" wrapText="true" />
+                        <Button layoutX="16.0" layoutY="127.0" mnemonicParsing="false" onMouseClicked="#onButtenClicked_chooseFile" text="Carregar ficheiro" />
+                        <Label fx:id="msg" layoutX="11.0" layoutY="239.0" text="Erro a carregar ficheiro!" textFill="#fc0202" visible="false" />
                      </children>
                   </AnchorPane>
                </content>
             </TitledPane>
         </panes>
       </Accordion>
-    <AnchorPane fx:id="anchorPane1" minHeight="0.0" minWidth="0.0" prefHeight="798.0" prefWidth="610.0">
+    <AnchorPane fx:id="anchorPane1" minHeight="0.0" minWidth="0.0" prefHeight="798.0" prefWidth="748.0">
          <children>
             <SubScene fx:id="subScene1" fill="BLACK" height="398.0" width="417.0">
               <root>

@@ -36,8 +36,10 @@ object IO_Utils extends App {
 
       case Failure(e) => e match {
         case _: FileNotFoundException => println("Ficheiro não encontrado. Selecione outro."); getFile
-        case e: IllegalArgumentException => println(e + " Selecione outro ficheiro."); getFile
+        case e: IllegalArgumentException => println(e.getMessage + " Selecione outro ficheiro."); getFile
         case _: IOException => println("Ocorreu um erro a ler o ficheiro. Selecione outro."); getFile
+        case _ => println("Ocorreu um erro inesperado. Selecione outro ficheiro."); getFile
+
       }
     }
   }
@@ -56,6 +58,7 @@ object IO_Utils extends App {
           case Nil => println("Não existe um última sessão, ou então não foi guardada."); loadFile
           case _ => println("Última sessão carregada com sucesso! "); createTree(shapes)
         }
+      case _ => println("Input Inválido! Escolher uma das opções (a, b, ...)"); loadFile
     }
   }
 
@@ -78,6 +81,7 @@ object IO_Utils extends App {
         getUserInput.toUpperCase match {
           case "A" => mainLoop(OctreeUtils.mapColourEffect(c => OctreeUtils.greenRemove(c))(oct))
           case "B" => mainLoop(OctreeUtils.mapColourEffect(c => OctreeUtils.sepiaEffect(c))(oct))
+          case _ => println("Input Inválido! Escolher uma das opções (a, b, ...)"); mainLoop(oct)
         }
       case "D" =>
         println("Que escala pretende aplicar?" +
@@ -86,6 +90,7 @@ object IO_Utils extends App {
         getUserInput.toUpperCase match {
           case "A" => mainLoop(OctreeUtils.scaleOctree(2, oct))
           case "B" => mainLoop(OctreeUtils.scaleOctree(0.5, oct))
+          case _ => println("Input Inválido! Escolher uma das opções (a, b, ...)"); mainLoop(oct)
         }
       case "E" => oct
       case _ =>

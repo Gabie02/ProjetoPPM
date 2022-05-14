@@ -19,7 +19,7 @@ object GraphicModelConstructor {
     val dir = System.getProperty("user.dir")
     val bufferedSource = Source.fromFile(s"$dir/$file")
     if (bufferedSource.isEmpty)
-      println("Ficheiro vazio!")
+      throw new IllegalArgumentException("Ficheiro vazio!")
     for (line <- bufferedSource.getLines) {
       shapes += buildObject(line)
     }

@@ -1,9 +1,13 @@
-//import IO_Utils.oct
-import OctreeUtils.mapColourEffect
+
+import OctreeUtils.{Placement, createTree}
 import javafx.fxml.FXML
-import javafx.scene.control.{Button, RadioButton, ToggleButton, ToggleGroup}
+import javafx.scene.control.{Button, Label, RadioButton, TextField, ToggleButton, ToggleGroup}
 import javafx.scene.{Group, SubScene}
 import javafx.scene.layout.{AnchorPane, GridPane}
+import javafx.scene.paint.Color
+
+import java.io.{FileNotFoundException, IOException}
+import scala.util.{Failure, Success, Try}
 
 class Controller {
 
@@ -19,6 +23,12 @@ class Controller {
   private var button_fator2 : RadioButton = _
   @FXML
   private var button_fator05 : RadioButton = _
+  @FXML
+  private var text_field: TextField = _
+  @FXML
+  private var msg: Label = _
+
+  var Tree: Octree[Placement] = IO_Utils.OcTree
 
 
   //  --- T7 ---
@@ -30,28 +40,54 @@ class Controller {
     subScene1.heightProperty.bind(anchorPane1.heightProperty)
     subScene1.setRoot(InitSubScene.root)
 
-    OctreeUtils.addOctreeToWorldRoot(IO_Utils.OcTree, InitSubScene.worldRoot)
+    OctreeUtils.addOctreeToWorldRoot(Tree, InitSubScene.worldRoot)
   }
     def onButtonClicked_color():Unit = {
 
-      if (button_sepia.isSelected) OctreeUtils.mapColourEffect(c => OctreeUtils.sepiaEffect(c))(IO_Utils.OcTree)
-      else if (button_greenRemove.isSelected) OctreeUtils.mapColourEffect(c => OctreeUtils.greenRemove(c))(IO_Utils.OcTree)
+      if (button_sepia.isSelected) Tree = OctreeUtils.mapColourEffect(c => OctreeUtils.sepiaEffect(c))(Tree)
+      else if (button_greenRemove.isSelected) Tree = OctreeUtils.mapColourEffect(c => OctreeUtils.greenRemove(c))(Tree)
     }
 
   def onButtonClicked_scale():Unit = {
 
-    if (button_fator2.isSelected) OctreeUtils.scaleOctree(2, IO_Utils.OcTree)
-    else if(button_fator05.isSelected) OctreeUtils.scaleOctree(0.5, IO_Utils.OcTree)
+    if (button_fator2.isSelected) Tree = OctreeUtils.scaleOctree(2, Tree)
+    else if(button_fator05.isSelected) Tree = OctreeUtils.scaleOctree(0.5, Tree)
   }
 
-//
-//  def onButtenClicked_chooseFile():Unit = {
-//    import javafx.stage.FileChooser
-//    val fileChooser = new FileChooser
-//    fileChooser.setTitle("Open Resource File")
-//    fileChooser.getExtensionFilters.addAll(new Nothing("Text Files", "*.txt"), new Nothing("Image Files", "*.png", "*.jpg", "*.gif"), new Nothing("Audio Files", "*.wav", "*.mp3", "*.aac"), new Nothing("All Files", "*.*"))
-//    val selectedFile = fileChooser.showOpenDialog()
-//    if (selectedFile != null) mainStage.display(selectedFile)
-//  }
+  def onButtenClicked_chooseFile():Unit = {
+    val file = text_field.getText
+    val shapeList = Try(GraphicModelConstructor.readFromFile(file))
+    shapeList match {
+      case Success(s) =>
+        msg.setTextFill(Color.GREEN)
+        msg.setText("Ficheiro carregado com sucesso!");
+        msg.setVisible(true)
+        //Remover tree anterior
+        val previousShapeList = OctreeUtils.getAllShapes(Tree)
+        (previousShapeList foldRight()) ((h,_) => InitSubScene.worldRoot.getChildren.remove(h))
+        //Adicionar a nova tree
+        Tree = createTree(s)
+        OctreeUtils.addOctreeToWorldRoot(Tree, InitSubScene.worldRoot)
+        //Remover tree anterior da stage e adicionar a nova tree
+
+      case Failure(e) => e match {
+        case _: FileNotFoundException => msg.setTextFill(Color.RED); msg.setText("Ficheiro não encontrado. Selecione outro.");
+        case e: IllegalArgumentException => msg.setTextFill(Color.RED); msg.setText(e.getMessage + " Selecione outro ficheiro.");
+        case _: IOException => msg.setTextFill(Color.RED); msg.setText("Ocorreu um erro a ler o ficheiro. Selecione outro.");
+        case _ => msg.setTextFill(Color.RED); msg.setText("Ocorreu um erro inesperado. Selecione outro ficheiro.");
+      }
+      msg.setVisible(true)
+    }
+  }
+
+  def onButtenClicked_loadPreviousState(): Unit = {
+    //Remover Tree
+    val previousShapeList = OctreeUtils.getAllShapes(Tree)
+    (previousShapeList foldRight()) ((h,_) => InitSubScene.worldRoot.getChildren.remove(h))
+    //Adicionar nova tree
+    val shapeList = Try(GraphicModelConstructor.readFromFile("lastTree.txt")).get
+    Tree = createTree(shapeList)
+    OctreeUtils.addOctreeToWorldRoot(Tree, InitSubScene.worldRoot)
+  }
 
 }

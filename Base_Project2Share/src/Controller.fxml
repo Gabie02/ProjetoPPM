@@ -76,11 +76,12 @@
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <TextField layoutX="16.0" layoutY="88.0" promptText="exemplo.txt" />
-                        <Button layoutX="16.0" layoutY="196.0" mnemonicParsing="false" text="Carregar" />
+                        <TextField fx:id="text_field" layoutX="16.0" layoutY="88.0" promptText="exemplo.txt" />
+                        <Button layoutX="16.0" layoutY="196.0" mnemonicParsing="false" onMouseClicked="#onButtenClicked_loadPreviousState" text="Carregar" />
                         <Label layoutX="13.0" layoutY="167.0" text="Carregar última sessão" />
                         <Label layoutX="14.0" layoutY="57.0" prefHeight="25.0" prefWidth="225.0" text="Nome do ficheiro que pretende carregar" wrapText="true" />
-                        <Button layoutX="16.0" layoutY="127.0" mnemonicParsing="false" text="Carregar ficheiro" />
+                        <Button layoutX="16.0" layoutY="127.0" mnemonicParsing="false" onMouseClicked="#onButtenClicked_chooseFile" text="Carregar ficheiro" />
+                        <Label fx:id="msg" layoutX="11.0" layoutY="239.0" text="Erro a carregar ficheiro!" textFill="#fc0202" visible="false" />
                      </children>
                   </AnchorPane>
                </content>

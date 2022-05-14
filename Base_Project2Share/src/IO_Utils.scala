@@ -24,6 +24,13 @@ object IO_Utils extends App {
 
   def getUserInput: String = readLine.trim
 
+  def handleIOExceptions(e: Throwable): Unit = e match {
+    case _: FileNotFoundException => println("Ficheiro não encontrado. Selecione outro.");
+    case e: IllegalArgumentException => println(e.getMessage + " Selecione outro ficheiro.");
+    case _: IOException => println("Ocorreu um erro a ler o ficheiro. Selecione outro.");
+    case _ => println("Ocorreu um erro inesperado. Selecione outro ficheiro.");
+  }
+
   @tailrec
   def getFile: Octree[Placement] = {
     println("Diga qual o nome do ficheiro de texto que pretende usar: ")
@@ -33,14 +40,7 @@ object IO_Utils extends App {
       case Success(s) =>
         println("Ficheiro lido com sucesso!")
         OctreeUtils.createTree(s)
-
-      case Failure(e) => e match {
-        case _: FileNotFoundException => println("Ficheiro não encontrado. Selecione outro."); getFile
-        case e: IllegalArgumentException => println(e.getMessage + " Selecione outro ficheiro."); getFile
-        case _: IOException => println("Ocorreu um erro a ler o ficheiro. Selecione outro."); getFile
-        case _ => println("Ocorreu um erro inesperado. Selecione outro ficheiro."); getFile
-
-      }
+      case Failure(e) => handleIOExceptions(e);getFile
     }
   }
 
@@ -54,10 +54,15 @@ object IO_Utils extends App {
       case "A" =>
         getFile
       case "B" =>
-        val shapes = GraphicModelConstructor.readFromFile("lastTree.txt")
+        val shapes = Try( GraphicModelConstructor.readFromFile("lastTree.txt"))
         shapes match {
-          case Nil => println("Não existe um última sessão, ou então não foi guardada."); loadFile
-          case _ => println("Última sessão carregada com sucesso! "); createTree(shapes)
+          case Success(s) =>
+          println("Ficheiro lido com sucesso!")
+          s match {
+            case Nil => println("Não existe um última sessão, ou então não foi guardada."); loadFile
+            case _ => println("Última sessão carregada com sucesso! "); createTree(s)
+          }
+        case Failure(e) => handleIOExceptions(e); loadFile
         }
       case _ => println("Input Inválido! Escolher uma das opções (a, b, ...)"); loadFile
     }

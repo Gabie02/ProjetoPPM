@@ -28,9 +28,6 @@ class Controller {
   @FXML
   private var msg: Label = _
 
-  //var Tree: Octree[Placement] = IO_Utils.OcTree
-
-
   //  --- T7 ---
   @FXML
   def initialize(): Unit = {
@@ -68,7 +65,6 @@ class Controller {
         //Adicionar a nova tree
         IO_Utils.OcTree = createTree(s)
         OctreeUtils.addOctreeToWorldRoot(IO_Utils.OcTree, InitSubScene.worldRoot)
-        //Remover tree anterior da stage e adicionar a nova tree
 
       case Failure(e) => e match {
         case _: FileNotFoundException => msg.setTextFill(Color.RED); msg.setText("Ficheiro não encontrado. Selecione outro.");

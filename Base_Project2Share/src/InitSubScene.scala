@@ -6,18 +6,17 @@ import javafx.scene.paint.{Color, PhongMaterial}
 import javafx.scene.shape.{Box, Cylinder, DrawMode, Line}
 import javafx.scene.transform.Rotate
 
-object InitSubScene{
+object InitSubScene {
 
-//  IO_Utils.
   //Materials to be applied to the 3D objects
   val redMaterial = new PhongMaterial()
-  redMaterial.setDiffuseColor(Color.rgb(150,0,0))
+  redMaterial.setDiffuseColor(Color.rgb(150, 0, 0))
 
   val greenMaterial = new PhongMaterial()
-  greenMaterial.setDiffuseColor(Color.rgb(0,255,255))
+  greenMaterial.setDiffuseColor(Color.rgb(0, 255, 255))
 
   val blueMaterial = new PhongMaterial()
-  blueMaterial.setDiffuseColor(Color.rgb(0,0,150))
+  blueMaterial.setDiffuseColor(Color.rgb(0, 0, 150))
 
   //3D objects
   val lineX = new Line(0, 0, 200, 0)
@@ -43,18 +42,8 @@ object InitSubScene{
   wiredBox.setMaterial(redMaterial)
   wiredBox.setDrawMode(DrawMode.LINE)
 
-//    --- T1 ---
-  //Leitura do ficheiro de configuração
-      //val listaShapes = IO_Utils.readFromFile(params.getRaw.get(0))
-
-      // 3D objects (group of nodes - javafx.scene.Node) that will be provide to the subScene
-      val worldRoot:Group = new Group(camVolume, lineX, lineY, lineZ, wiredBox)
-
-      //Adicionar shapes à scene
-//      (listaShapes foldRight ()) ((h, t) => {
-//        worldRoot.getChildren.add(h); t
-//      })
-  //val worldRoot:Group = new Group(camVolume, lineX, lineY, lineZ)
+  // 3D objects (group of nodes - javafx.scene.Node) that will be provide to the subScene
+  val worldRoot: Group = new Group(camVolume, lineX, lineY, lineZ, wiredBox)
 
   // Camera
   val camera = new PerspectiveCamera(true)
@@ -71,7 +60,7 @@ object InitSubScene{
   cameraTransform.rx.setAngle(-45.0)
   worldRoot.getChildren.add(cameraTransform)
 
-  val subScene = new SubScene(worldRoot,200,200,true,SceneAntialiasing.BALANCED)
+  val subScene = new SubScene(worldRoot, 200, 200, true, SceneAntialiasing.BALANCED)
   subScene.setFill(Color.DARKSLATEGRAY)
   subScene.setCamera(camera)
 
@@ -88,18 +77,19 @@ object InitSubScene{
   StackPane.setAlignment(cameraView, Pos.BOTTOM_RIGHT)
   StackPane.setMargin(cameraView, new Insets(5))
 
-  val root = new StackPane(subScene,cameraView)
+  val root = new StackPane(subScene, cameraView)
 
   root.setOnMouseClicked((event) => {
     camVolume.setTranslateX(camVolume.getTranslateX + 2)
   })
 
-
   // ---T3---
   //Quando se muda a visualização e movimento da camera, as partiçoes que estão dentro da camera de visualização, mudam de cor (verde neste caso)
-  subScene.setOnMouseClicked(event => { event.getButton() match {
-    case MouseButton.PRIMARY => OctreeUtils.intersectsCamera(IO_Utils.OcTree, camVolume)
-    case _ =>
-  }})
+  subScene.setOnMouseClicked(event => {
+    event.getButton() match {
+      case MouseButton.PRIMARY => OctreeUtils.intersectsCamera(IO_Utils.OcTree, camVolume)
+      case _ =>
+    }
+  })
 
 }

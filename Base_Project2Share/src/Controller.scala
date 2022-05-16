@@ -40,8 +40,8 @@ class Controller {
   }
     def onButtonClicked_color():Unit = {
 
-      if (button_sepia.isSelected) IO_Utils.OcTree = OctreeUtils.mapColourEffect(c => OctreeUtils.sepiaEffect(c))(IO_Utils.OcTree)
-      else if (button_greenRemove.isSelected) IO_Utils.OcTree = OctreeUtils.mapColourEffect(c => OctreeUtils.greenRemove(c))(IO_Utils.OcTree)
+      if (button_sepia.isSelected) OctreeUtils.mapColourEffect(c => OctreeUtils.sepiaEffect(c))(IO_Utils.OcTree)
+      else if (button_greenRemove.isSelected) OctreeUtils.mapColourEffect(c => OctreeUtils.greenRemove(c))(IO_Utils.OcTree)
     }
 
   def onButtonClicked_scale():Unit = {
@@ -65,24 +65,41 @@ class Controller {
         IO_Utils.OcTree = createTree(s)
         OctreeUtils.addOctreeToWorldRoot(IO_Utils.OcTree, InitSubScene.worldRoot)
 
-      case Failure(e) => e match {
-        case _: FileNotFoundException => msg.setTextFill(Color.RED); msg.setText("Ficheiro não encontrado. Selecione outro.");
-        case e: IllegalArgumentException => msg.setTextFill(Color.RED); msg.setText(e.getMessage + " Selecione outro ficheiro.");
-        case _: IOException => msg.setTextFill(Color.RED); msg.setText("Ocorreu um erro a ler o ficheiro. Selecione outro.");
-        case _ => msg.setTextFill(Color.RED); msg.setText("Ocorreu um erro inesperado. Selecione outro ficheiro.");
+      case Failure(e) =>
+        msg.setTextFill(Color.RED)
+        e match {
+        case _: FileNotFoundException => msg.setText("Ficheiro não encontrado. Selecione outro.");
+        case e: IllegalArgumentException => msg.setText(e.getMessage + " Selecione outro ficheiro.");
+        case _: IOException =>  msg.setText("Ocorreu um erro a ler o ficheiro. Selecione outro.");
+        case _ => msg.setText("Ocorreu um erro inesperado. Selecione outro ficheiro.");
       }
       msg.setVisible(true)
     }
   }
 
   def onButtenClicked_loadPreviousState(): Unit = {
-    //Remover Tree
-    val previousShapeList = OctreeUtils.getAllShapes(IO_Utils.OcTree)
-    (previousShapeList foldRight()) ((h,_) => InitSubScene.worldRoot.getChildren.remove(h))
-    //Adicionar nova tree
-    val shapeList = Try(GraphicModelConstructor.readFromFile("lastTree.txt")).get
-    IO_Utils.OcTree = createTree(shapeList)
-    OctreeUtils.addOctreeToWorldRoot(IO_Utils.OcTree, InitSubScene.worldRoot)
+
+    val shapeList = Try(GraphicModelConstructor.readFromFile("lastTree.txt"))
+    shapeList match {
+      case Success(s) =>
+        println(s)
+        s match {
+          case Nil => msg.setText("Não existe um última sessão, ou então não foi guardada.");
+          case _ =>
+            msg.setText("Última sessão carregada com sucesso! ")
+            //Remover Tree anterior
+            val previousShapeList = OctreeUtils.getAllShapes(IO_Utils.OcTree)
+            (previousShapeList foldRight()) ((h,_) => InitSubScene.worldRoot.getChildren.remove(h))
+            //Adicionar nova tree
+            IO_Utils.OcTree = createTree(s)
+            OctreeUtils.addOctreeToWorldRoot(IO_Utils.OcTree, InitSubScene.worldRoot)
+        }
+      case Failure(_) =>
+        msg.setTextFill(Color.RED)
+        msg.setText("Ocorreu um erro a ler a última sessão")
+        msg.setVisible(true)
+    }
+
   }
 
 }

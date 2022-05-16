@@ -17,6 +17,7 @@ object OctreeUtils {
     (p1._1 + p2._1, p1._2 + p2._2, p1._3 + p2._3)
   }
 
+  //Devolve todos os shapes que estiverem nas leafs da tree
   def getAllShapes(oct: Octree[Placement]): List[Shape3D] = {
     oct match {
       case n: OcNode[Placement] =>
@@ -30,7 +31,7 @@ object OctreeUtils {
     }
   }
 
-  //Devolve os todos os atributos de um node, exceto o primeiro, que é o placement
+  //Devolve todos os atributos de um node, exceto o primeiro, que é o placement
   def createAttributesList(e: OcNode[Placement]): List[Octree[Placement]] = {
     val numAtributos = e.productArity
 
@@ -82,7 +83,7 @@ object OctreeUtils {
     }
   }
 
-  //Cria todas as origens que fazem as partições de um espaço
+  //Cria todas as origens das partições de um espaço
   def createOrigins(placement: Placement): List[Point] = {
     val point = placement._1
     val size = placement._2
@@ -94,7 +95,7 @@ object OctreeUtils {
   }
 
   //Determina se um shape contido num node está contido numa partição do mesmo
-  // (Se a partição pode ser dividida para esse node)
+  // (Se esse node pode ser dividido)
   def canBeDivided(node: Placement, s: Shape3D): Boolean = {
     val partitionsOrigins = createOrigins(node)
     (partitionsOrigins foldRight false) ((h, t) => {
@@ -112,7 +113,7 @@ object OctreeUtils {
 
     //Para cada partição ver se se existe alguma figura que esteja contida na mesma
     def iterateThroughPartitions(tree: Octree[Placement], partitions: List[Point], i: Int, stop: Int, depth: Int): Octree[Placement] = {
-      if (i > stop || root._2 == smallestPartitionSize || depth <= 0)
+      if (i > stop || root._2 <= smallestPartitionSize || depth <= 0)
         return tree
 
       val partition = createWiredBox(partitions(i), size / 2)

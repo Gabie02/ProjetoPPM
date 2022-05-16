@@ -85,8 +85,8 @@ object IO_Utils extends App {
           "\na) Remover verdes" +
           "\nb) Efeito sépia")
         getUserInput.toUpperCase match {
-          case "A" => mainLoop(OctreeUtils.mapColourEffect(c => OctreeUtils.greenRemove(c))(oct))
-          case "B" => mainLoop(OctreeUtils.mapColourEffect(c => OctreeUtils.sepiaEffect(c))(oct))
+          case "A" => OctreeUtils.mapColourEffect(c => OctreeUtils.greenRemove(c))(oct); mainLoop(oct)
+          case "B" => OctreeUtils.mapColourEffect(c => OctreeUtils.sepiaEffect(c))(oct); mainLoop(oct)
           case _ => println("Input Inválido! Escolher uma das opções (a, b, ...)"); mainLoop(oct)
         }
       case "D" =>
@@ -94,8 +94,8 @@ object IO_Utils extends App {
           "\na) Escala 2" +
           "\nb) Escala 0.5")
         getUserInput.toUpperCase match {
-          case "A" => mainLoop(OctreeUtils.scaleOctree(2, oct))
-          case "B" => mainLoop(OctreeUtils.scaleOctree(0.5, oct))
+          case "A" => OctreeUtils.scaleOctree(2, oct); mainLoop(oct)
+          case "B" => OctreeUtils.scaleOctree(0.5, oct); mainLoop(oct)
           case _ => println("Input Inválido! Escolher uma das opções (a, b, ...)"); mainLoop(oct)
         }
       case "E" => oct

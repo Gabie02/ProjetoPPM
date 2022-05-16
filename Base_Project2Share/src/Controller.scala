@@ -5,7 +5,6 @@ import javafx.scene.control.{Button, Label, RadioButton, TextField, ToggleButton
 import javafx.scene.{Group, SubScene}
 import javafx.scene.layout.{AnchorPane, GridPane}
 import javafx.scene.paint.Color
-
 import java.io.{FileNotFoundException, IOException}
 import scala.util.{Failure, Success, Try}
 

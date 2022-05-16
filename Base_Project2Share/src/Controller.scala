@@ -82,7 +82,6 @@ class Controller {
     val shapeList = Try(GraphicModelConstructor.readFromFile("lastTree.txt"))
     shapeList match {
       case Success(s) =>
-        println(s)
         s match {
           case Nil => msg.setText("Não existe um última sessão, ou então não foi guardada.");
           case _ =>

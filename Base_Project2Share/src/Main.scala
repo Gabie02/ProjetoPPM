@@ -19,7 +19,6 @@ class Main extends Application {
   }
 
   override def stop(): Unit = {
-    println("stopped")
     GraphicModelConstructor.writeFile(IO_Utils.OcTree)
   }
 }
